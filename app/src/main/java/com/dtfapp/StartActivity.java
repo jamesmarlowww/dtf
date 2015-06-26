@@ -10,7 +10,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -41,12 +40,6 @@ public class StartActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-       // if(checkLogin()) {
-//            Intent i = new Intent(this, ListOfFriends.class);
-//            startActivity(i);
-
-       // } else {
-
             super.onCreate(savedInstanceState);
 
             // Initialize SDK before setContentView(Layout ID)
@@ -65,14 +58,18 @@ public class StartActivity extends Activity {
                     onFblogin();
                 }
             });
-   //     }
-        if(checkLogin()) Toast.makeText(getApplicationContext(), "yup logged int", Toast.LENGTH_SHORT).show();
+
+        if(checkLogin()) {
+            Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+            this.startActivity(i);
+        }
+
 
     }
 
+
     // Private method to handle Facebook login and callback
-    private void onFblogin()
-    {
+    private void onFblogin() {
         callbackmanager = CallbackManager.Factory.create();
 
         // Set permissions
@@ -111,6 +108,8 @@ public class StartActivity extends Activity {
 
                                 }).executeAsync();
 
+                        Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+                        startActivity(i);
                     }
 
                     @Override
@@ -135,25 +134,13 @@ public class StartActivity extends Activity {
 
     public boolean checkLogin() {
         boolean loggedIn = false;
+        AccessToken t = AccessToken.getCurrentAccessToken();
         if (AccessToken.getCurrentAccessToken() != null)
             loggedIn = true;
 
         return loggedIn;
     }
 
-
-    public void checkLogin(View v) {
-
-        boolean loggedIn = false;
-        if (AccessToken.getCurrentAccessToken() != null)
-            loggedIn = true;
-
-        if (loggedIn) {
-            Toast.makeText(getApplicationContext(), "logged in nigger", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "ah rats", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public void getHashKey() {
         try {

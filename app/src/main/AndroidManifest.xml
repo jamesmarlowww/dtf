@@ -23,6 +23,7 @@
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:label="@string/app_name" />
+        <activity android:name=".ListOfFriends"/>
     </application>
 
 </manifest>
