@@ -40,33 +40,32 @@ public class StartActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-            // Initialize SDK before setContentView(Layout ID)
-            FacebookSdk.sdkInitialize(getApplicationContext());
+        // Initialize SDK before setContentView(Layout ID)
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
-            setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
-            // Initialize layout button
-            fbbutton = (Button) findViewById(R.id.login_button);
+        // Initialize layout button
+        fbbutton = (Button) findViewById(R.id.login_button);
 
-            fbbutton.setOnClickListener(new View.OnClickListener() {
+        fbbutton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    // Call private method
-                    onFblogin();
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                // Call private method
+                onFblogin();
+            }
+        });
 
-        if(checkLogin()) {
+        if (checkLogin()) {
             Intent i = new Intent(StartActivity.this, ListOfFriends.class);
             this.startActivity(i);
         }
 
 
     }
-
 
     // Private method to handle Facebook login and callback
     private void onFblogin() {
