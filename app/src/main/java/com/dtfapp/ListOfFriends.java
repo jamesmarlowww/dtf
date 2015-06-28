@@ -37,9 +37,9 @@ public class ListOfFriends extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_friends);
         findFriends();
-        friends.add("ian");
-        friends.add("ian");
-        friends.add("ian");
+        for (int i = 0; i < 5; i++) {
+            friends.add("ian ");
+        }
         displayFriends(friends);
 
     }
