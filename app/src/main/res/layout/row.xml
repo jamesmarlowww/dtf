@@ -1,4 +1,5 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rowTextView"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"

@@ -1,10 +1,12 @@
 package com.dtfapp;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.text.Layout;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -12,45 +14,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
-import com.facebook.internal.Utility;
+import com.facebook.login.widget.ProfilePictureView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
  * Created by James on 5/23/2015.
  */
-public class ListOfFriends extends Activity{
+public class ListOfFriends extends FragmentActivity {
     private int count;
     ArrayAdapter<String> listAdapter;
     private ListView listViewFriends;
     private ArrayList<String> friends = new ArrayList<String>();
+    private ArrayList<Integer> friendsID = new ArrayList<Integer>();
+    private ArrayList<URL> friendsDpUrl = new ArrayList<>();
+    private boolean hasFriends;
+    CallbackManager callbackManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_friends);
         findFriends();
-        for (int i = 0; i < 5; i++) {
-            friends.add("ian ");
-        }
-        displayFriends(friends);
+
+        callbackManager = CallbackManager.Factory.create();
 
     }
 
-    public void addItems(View v, String s) {
-        friends.add(s);
-    }
 
-    public ArrayList findFriends() {
+    public boolean findFriends() {
         GraphRequestBatch batch = new GraphRequestBatch(
-                GraphRequest.newMyFriendsRequest(
+
+        GraphRequest.newMyFriendsRequest(
                         AccessToken.getCurrentAccessToken(),
                         new GraphRequest.GraphJSONArrayCallback() {
                             @Override
@@ -59,41 +65,31 @@ public class ListOfFriends extends Activity{
                                     GraphResponse response) {
                                 // Application code for users friends
 
-                                Toast.makeText(getApplicationContext(), "Num of friends: "+jsonArray.length(), Toast.LENGTH_LONG).show();
+                                if(jsonArray.length() >0) setHasFriends(true); else setHasFriends(false);
 
-                                try {
-                                    int id;
-                                    String name;
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject row = jsonArray.getJSONObject(i);
-                                        id = row.getInt("id");
-                                        name = row.getString("name");
-                                        Toast.makeText(getApplicationContext(), id+""+name, Toast.LENGTH_LONG).show();
+                                for (int i=0; i<jsonArray.length(); i++) {
+                                    try {
+                                        String s = jsonArray.getJSONObject(i).getString("name");
+                                        int id = jsonArray.getJSONObject(i).getInt("id");
+
+                                        friends.add(s);
+                                        friendsID.add(id);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        Log.e("JSON error", e.toString());
                                     }
-                                } catch (JSONException e) {
-
                                 }
-                                System.out.println("getFriendsData onCompleted : jsonArray " + jsonArray);
+                                displayFriends();
 
-                                Toast.makeText(getApplicationContext(), jsonArray.toString() ,Toast.LENGTH_LONG).show();
+                                String s = null;
+                                try {
+                                    s = jsonArray.getJSONObject(1).toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                Toast.makeText(getApplicationContext(),s , Toast.LENGTH_SHORT).show();
 
-                                System.out.println("getFriendsData onCompleted : response " + response);
-
-                                Toast.makeText(getApplicationContext(), response.toString() ,Toast.LENGTH_LONG).show();
-
-
-
-
-
-
-//                                try {
-//                                    JSONObject jsonObject = response.getJSONObject();
-//                                    System.out.println("getFriendsData onCompleted : jsonObject " + jsonObject);
-//                                    JSONObject summary = jsonObject.getJSONObject("summary");
-//                                    System.out.println("getFriendsData onCompleted : summary total_count - " + summary.getString("total_count"));
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
                             }
                         })
 
@@ -106,15 +102,35 @@ public class ListOfFriends extends Activity{
 
             }
         });
+
+
         batch.executeAsync();
+//
+//        Bundle parameters = new Bundle();
+//        parameters.putString("fields", "id,name,link,picture");
+        String query = "SELECT uid, name, pic, pic_small, pic_big FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me())";
 
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link,picture");
+        Bundle params = new Bundle();
+        params.putString("method", "fql.query");
+        params.putString("query", query);
+//        mAsyncFacebookRunner.request(null, params, new CustomRequestListener());
 
 
+        return isHasFriends();
 
-        return friends;
     }
+
+
+    public void getDpImage() throws MalformedURLException {
+
+        for(int i : friendsID) {
+            URL image_value = new URL("https://graph.facebook.com/" + friendsID.get(i) + "/picture");
+            friendsDpUrl.add(image_value);
+        }
+
+    }
+
+
 
     private void getUserInfo() {
 
@@ -128,9 +144,7 @@ public class ListOfFriends extends Activity{
                         // Application code
 
                         try {
-                            String name = object.getString("name");
-
-                            Toast.makeText(getApplicationContext(),name+"\n", Toast.LENGTH_LONG).show();
+                            String id  = object.getString("id");
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(),e.toString(), Toast.LENGTH_LONG).show();
@@ -144,35 +158,53 @@ public class ListOfFriends extends Activity{
         request.setParameters(parameters);
         request.executeAsync();
 
-
-
     }
 
-    public void displayFriends(ArrayList a) {
-
+    public void displayFriends() {
 
         // Find the ListView resource.
         listViewFriends = (ListView) findViewById(R.id.listFriends);
 
-        // Create ArrayAdapter using the planet list.
-        listAdapter = new ArrayAdapter<String>(this, R.layout.row, a);
+        listAdapter = new ArrayAdapter<String>(this, R.layout.row2, friends);
 
-        // Set the ArrayAdapter as the ListView's adapter.
+
         listViewFriends.setAdapter(listAdapter);
 
-
-        //Implement on click method ... when user clicks on a name ... present with option to remove friend.
         listViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
                                     long id) {
-                // We know the View is a TextView so we can cast it
-                TextView clickedView = (TextView) view;
-//                removeFriendPopUp(clickedView.getText().toString());
+                //code for onClick item.
 
             }
 
         });
     }
+
+    public void showHideFrgament(final Fragment fragment){
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out);
+
+        if (fragment.isHidden()) {
+            ft.show(fragment);
+            Log.d("hidden","Show");
+        } else {
+            ft.hide(fragment);
+            Log.d("Shown","Hide");
+        }
+        ft.commit();
+
+    }
+
+    public void setHasFriends(boolean hasFriends) {
+        this.hasFriends = hasFriends;
+    }
+
+    public boolean isHasFriends() {
+        return hasFriends;
+    }
+
 
 
 }

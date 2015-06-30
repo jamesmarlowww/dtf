@@ -9,7 +9,12 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -47,15 +52,17 @@ public class StartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize SDK before setContentView(Layout ID)
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         setContentView(R.layout.activity_main);
 
-        // Initialize layout button
-        fbbutton = (LoginButton) findViewById(R.id.login_button);
-//        fbbutton.setReadPermissions("user_friends");
+        if (checkLogin()) {
+            Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+//            finish();
+            startActivity(i);
+        }
 
+        fbbutton = (LoginButton) findViewById(R.id.login_button);
         fbbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,14 +71,25 @@ public class StartActivity extends Activity {
             }
         });
 
-        if (checkLogin()) {
-            Intent i = new Intent(StartActivity.this, ListOfFriends.class);
-            this.startActivity(i);
-        }
 
-
+        rotateImage();
 
     }
+
+    public void rotateImage() {
+        TextView tv = (TextView) findViewById(R.id.penis);
+
+        //rotate from the start of string
+        RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
+        //rotate from center
+//        RotateAnimation anim = new RotateAnimation(0f, 350f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+
+        anim.setInterpolator(new LinearInterpolator());
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setDuration(700);
+        tv.startAnimation(anim);
+    }
+
 
     // Private method to handle Facebook login and callback
     private void onFblogin() {
@@ -86,8 +104,9 @@ public class StartActivity extends Activity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
 
-//                        Intent i = new Intent(StartActivity.this, ListOfFriends.class);
-//                        startActivity(i);
+                        Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+//                        finish();
+                        startActivity(i);
                     }
 
                     @Override
