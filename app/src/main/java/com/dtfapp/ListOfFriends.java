@@ -1,6 +1,5 @@
 package com.dtfapp;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -18,7 +16,6 @@ import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
-import com.facebook.login.widget.ProfilePictureView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,11 +30,8 @@ import java.util.ArrayList;
  */
 public class ListOfFriends extends FragmentActivity {
     private int count;
-    ArrayAdapter<String> listAdapter;
     private ListView listViewFriends;
-    private ArrayList<String> friends = new ArrayList<String>();
-    private ArrayList<Integer> friendsID = new ArrayList<Integer>();
-    private ArrayList<URL> friendsDpUrl = new ArrayList<>();
+    private ArrayList<FriendInfo> friendsInfo = new ArrayList<FriendInfo>();
     private boolean hasFriends;
     CallbackManager callbackManager;
 
@@ -55,7 +49,6 @@ public class ListOfFriends extends FragmentActivity {
 
     public boolean findFriends() {
         GraphRequestBatch batch = new GraphRequestBatch(
-
         GraphRequest.newMyFriendsRequest(
                         AccessToken.getCurrentAccessToken(),
                         new GraphRequest.GraphJSONArrayCallback() {
@@ -72,8 +65,8 @@ public class ListOfFriends extends FragmentActivity {
                                         String s = jsonArray.getJSONObject(i).getString("name");
                                         int id = jsonArray.getJSONObject(i).getInt("id");
 
-                                        friends.add(s);
-                                        friendsID.add(id);
+
+                                        friendsInfo.add(new FriendInfo(s, id, false, false));
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -103,17 +96,12 @@ public class ListOfFriends extends FragmentActivity {
             }
         });
 
-
         batch.executeAsync();
-//
-//        Bundle parameters = new Bundle();
-//        parameters.putString("fields", "id,name,link,picture");
         String query = "SELECT uid, name, pic, pic_small, pic_big FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me())";
 
         Bundle params = new Bundle();
         params.putString("method", "fql.query");
         params.putString("query", query);
-//        mAsyncFacebookRunner.request(null, params, new CustomRequestListener());
 
 
         return isHasFriends();
@@ -123,9 +111,8 @@ public class ListOfFriends extends FragmentActivity {
 
     public void getDpImage() throws MalformedURLException {
 
-        for(int i : friendsID) {
-            URL image_value = new URL("https://graph.facebook.com/" + friendsID.get(i) + "/picture");
-            friendsDpUrl.add(image_value);
+        for(FriendInfo i : friendsInfo) {
+            URL image_value = new URL("https://graph.facebook.com/" + i.getId() + "/picture");
         }
 
     }
@@ -162,13 +149,9 @@ public class ListOfFriends extends FragmentActivity {
 
     public void displayFriends() {
 
-        // Find the ListView resource.
         listViewFriends = (ListView) findViewById(R.id.listFriends);
-
-        listAdapter = new ArrayAdapter<String>(this, R.layout.row2, friends);
-
-
-        listViewFriends.setAdapter(listAdapter);
+        FriendListArrayAdapter friendListAdapter = new FriendListArrayAdapter(this, R.layout.row, friendsInfo);
+        listViewFriends.setAdapter(friendListAdapter);
 
         listViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
@@ -179,6 +162,9 @@ public class ListOfFriends extends FragmentActivity {
 
         });
     }
+
+
+
 
     public void showHideFrgament(final Fragment fragment){
 

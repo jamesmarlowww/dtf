@@ -1,11 +1,7 @@
 package com.dtfapp;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -23,13 +19,17 @@ public class LoadingScreen extends Fragment {
 //        super.onCreate(savedInstanceState);
 //        setContentView(R.layout.loading_spin_frag);
 //
-//        TextView penis = (TextView) findViewById(R.id.penisFrag);
-//
+//        TextView penis = (TextView) findViewById(R.id.penisText);
 //        RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
+//        //rotate from center
+////        RotateAnimation anim = new RotateAnimation(0f, 350f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//
 //        anim.setInterpolator(new LinearInterpolator());
 //        anim.setRepeatCount(Animation.INFINITE);
 //        anim.setDuration(700);
-//        penis.startAnimation(anim);
+//        peinis.startAnimation(anim);
+
+
 
 
     }

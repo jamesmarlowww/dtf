@@ -1,47 +1,44 @@
 package com.dtfapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphRequestBatch;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 // try remove java security and using 2nd one
 
 
-public class StartActivity extends Activity {
+public class SplashScreen extends Activity {
 
     private Button fbbutton;
 
@@ -57,7 +54,7 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         if (checkLogin()) {
-            Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+            Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
 //            finish();
             startActivity(i);
         }
@@ -72,13 +69,27 @@ public class StartActivity extends Activity {
         });
 
 
-        rotateImage();
+        TextView tv = (TextView) findViewById(R.id.penis);
+        rotateText(tv);
+//
+//        final Activity activity = this;
+//        final View content = activity.findViewById(android.R.id.content).getRootView();
+//        if (content.getWidth() > 0) {
+//            Bitmap image = BlurBuilder.blur(content);
+//            getWindow().setBackgroundDrawable(new BitmapDrawable(activity.getResources(), image));
+//        } else {
+//            content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                @Override
+//                public void onGlobalLayout() {
+//                    Bitmap image = BlurBuilder.blur(content);
+//                    getWindow().setBackgroundDrawable(new BitmapDrawable(activity.getResources(), image));
+//                }
+//            });
+//        }
 
     }
 
-    public void rotateImage() {
-        TextView tv = (TextView) findViewById(R.id.penis);
-
+    public void rotateText(TextView tv) {
         //rotate from the start of string
         RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
         //rotate from center
@@ -104,7 +115,7 @@ public class StartActivity extends Activity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
 
-                        Intent i = new Intent(StartActivity.this, ListOfFriends.class);
+                        Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
 //                        finish();
                         startActivity(i);
                     }
@@ -137,6 +148,9 @@ public class StartActivity extends Activity {
 
         return AccessToken.getCurrentAccessToken()!= null;
     }
+
+
+
 
 
 

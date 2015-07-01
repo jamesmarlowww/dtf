@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/penis"
         android:textColor="#ffffff"
-        android:id="@+id/penisFrag"
+        android:id="@+id/penisText"
         android:src="@string/penis"
         android:textSize="20sp"
         android:layout_centerHorizontal="true"

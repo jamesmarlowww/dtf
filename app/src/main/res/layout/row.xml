@@ -1,56 +1,33 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:facebook="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rowTextView"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:textSize="16sp"
-    android:textColor="#000000">
-</TextView>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent">-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
 
-    <!--<TextView-->
-        <!--android:id="@+id/textView1"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentTop="true" />-->
+        <ImageView
+            android:id="@+id/friendsPic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip" />
 
-    <!--<EditText-->
-        <!--android:id="@+id/unitEditText"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_below="@+id/textView1"-->
-        <!--android:ems="10"-->
-        <!--android:inputType="numberDecimal" >-->
+        <TextView
+            android:id="@+id/friendsName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="100dip"
+            android:layout_marginTop="20dip"
+            android:text="TextView"
+            android:textColor="#000000" />
+    </RelativeLayout>
 
-        <!--<requestFocus />-->
-    <!--</EditText>-->
 
-    <!--<Spinner-->
-        <!--android:id="@+id/unitSpinner"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignBottom="@+id/imageButton1"-->
-        <!--android:layout_marginBottom="15dp"-->
-        <!--android:layout_toRightOf="@+id/unitEditText" />-->
+</LinearLayout>
 
-    <!--<ImageButton-->
-        <!--android:id="@+id/imageButton1"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignBottom="@+id/unitEditText"-->
-        <!--android:layout_alignParentRight="true"-->
+    <!--<?xml version="1.0" encoding="utf-8"?>--><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:facebook="http://schemas.android.com/apk/res-auto"--><!--android:orientation="vertical"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:id="@+id/listView2">-->
 
-        <!--android:onClick="removeItem"-->
-
-        <!--android:contentDescription="@string/image_button_confirmDTF"-->
-        <!--android:src="@android:drawable/ic_menu_delete" />-->
-
-<!--</RelativeLayout>-->
-
+    <!--<TextView xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:id="@+id/facebookName"--><!--android:layout_width="fill_parent"--><!--android:layout_height="wrap_content"--><!--android:padding="10dp"--><!--android:textSize="16sp"--><!--android:textColor="#000000">--><!--</TextView>--><!-- --><!--</LinearLayout>-->
