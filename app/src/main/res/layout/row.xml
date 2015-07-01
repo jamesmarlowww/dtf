@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/dtf"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,6 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
+        <!--<com.facebook.login.widget.ProfilePictureView-->
+            <!--android:id="@+id/friendPic"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:padding="5sp"-->
+            <!--facebook:preset_size="small"/>-->
         <ImageView
             android:id="@+id/friendsPic"
             android:layout_width="wrap_content"
@@ -23,11 +31,7 @@
             android:layout_marginTop="20dip"
             android:text="TextView"
             android:textColor="#000000" />
+
     </RelativeLayout>
 
-
 </LinearLayout>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>--><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:facebook="http://schemas.android.com/apk/res-auto"--><!--android:orientation="vertical"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:id="@+id/listView2">-->
-
-    <!--<TextView xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:id="@+id/facebookName"--><!--android:layout_width="fill_parent"--><!--android:layout_height="wrap_content"--><!--android:padding="10dp"--><!--android:textSize="16sp"--><!--android:textColor="#000000">--><!--</TextView>--><!-- --><!--</LinearLayout>-->

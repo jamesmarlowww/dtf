@@ -2,12 +2,16 @@ package com.dtfapp;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,6 +25,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,7 +55,7 @@ public class ListOfFriends extends FragmentActivity {
 
     public boolean findFriends() {
         GraphRequestBatch batch = new GraphRequestBatch(
-        GraphRequest.newMyFriendsRequest(
+                GraphRequest.newMyFriendsRequest(
                         AccessToken.getCurrentAccessToken(),
                         new GraphRequest.GraphJSONArrayCallback() {
                             @Override
@@ -58,9 +64,10 @@ public class ListOfFriends extends FragmentActivity {
                                     GraphResponse response) {
                                 // Application code for users friends
 
-                                if(jsonArray.length() >0) setHasFriends(true); else setHasFriends(false);
+                                if (jsonArray.length() > 0) setHasFriends(true);
+                                else setHasFriends(false);
 
-                                for (int i=0; i<jsonArray.length(); i++) {
+                                for (int i = 0; i < jsonArray.length(); i++) {
                                     try {
                                         String s = jsonArray.getJSONObject(i).getString("name");
                                         int id = jsonArray.getJSONObject(i).getInt("id");
@@ -68,9 +75,11 @@ public class ListOfFriends extends FragmentActivity {
 
                                         friendsInfo.add(new FriendInfo(s, id, false, false));
 
-                                    } catch (JSONException e) {
+
+                                    } catch (Exception e) {
                                         e.printStackTrace();
-                                        Log.e("JSON error", e.toString());
+                                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                                        Log.e("error", e.toString());
                                     }
                                 }
                                 displayFriends();
@@ -81,7 +90,7 @@ public class ListOfFriends extends FragmentActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                Toast.makeText(getApplicationContext(),s , Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
 
                             }
                         })
@@ -108,14 +117,19 @@ public class ListOfFriends extends FragmentActivity {
 
     }
 
+    public Bitmap getDpImage(int id) throws MalformedURLException {
 
-    public void getDpImage() throws MalformedURLException {
-
-        for(FriendInfo i : friendsInfo) {
-            URL image_value = new URL("https://graph.facebook.com/" + i.getId() + "/picture");
+        Bitmap bitmap = null;
+        try {
+            URL imgUrl = new URL("https://graph.facebook.com/" + Integer.toString(id) + "/picture/?type=small"); //removed
+            InputStream in = (InputStream) imgUrl.getContent();
+            bitmap = BitmapFactory.decodeStream(in);
+        } catch (IOException e) {
+            Log.e("Error", e.toString());
         }
-
+        return bitmap;
     }
+
 
 
 
@@ -131,10 +145,10 @@ public class ListOfFriends extends FragmentActivity {
                         // Application code
 
                         try {
-                            String id  = object.getString("id");
+                            String id = object.getString("id");
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Toast.makeText(getApplicationContext(),e.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
 
 
                         }
@@ -164,9 +178,7 @@ public class ListOfFriends extends FragmentActivity {
     }
 
 
-
-
-    public void showHideFrgament(final Fragment fragment){
+    public void showHideFrgament(final Fragment fragment) {
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in,
@@ -174,10 +186,10 @@ public class ListOfFriends extends FragmentActivity {
 
         if (fragment.isHidden()) {
             ft.show(fragment);
-            Log.d("hidden","Show");
+            Log.d("hidden", "Show");
         } else {
             ft.hide(fragment);
-            Log.d("Shown","Hide");
+            Log.d("Shown", "Hide");
         }
         ft.commit();
 
@@ -190,7 +202,6 @@ public class ListOfFriends extends FragmentActivity {
     public boolean isHasFriends() {
         return hasFriends;
     }
-
 
 
 }
