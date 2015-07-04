@@ -48,7 +48,7 @@ public class ListOfFriends extends FragmentActivity {
         setContentView(R.layout.list_friends);
         findFriends();
 
-        callbackManager = CallbackManager.Factory.create();
+        getUserInfo();
 
     }
 
@@ -71,7 +71,6 @@ public class ListOfFriends extends FragmentActivity {
                                     try {
                                         String s = jsonArray.getJSONObject(i).getString("name");
                                         int id = jsonArray.getJSONObject(i).getInt("id");
-
 
                                         friendsInfo.add(new FriendInfo(s, id, false, false));
 
@@ -146,6 +145,9 @@ public class ListOfFriends extends FragmentActivity {
 
                         try {
                             String id = object.getString("id");
+                            String s = object.getString("age_range");
+                            Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
@@ -155,7 +157,7 @@ public class ListOfFriends extends FragmentActivity {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link");
+        parameters.putString("fields", "id,name, age_range");
         request.setParameters(parameters);
         request.executeAsync();
 

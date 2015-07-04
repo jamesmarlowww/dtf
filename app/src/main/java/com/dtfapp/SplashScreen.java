@@ -14,19 +14,26 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 // try remove java security and using 2nd one
 
@@ -34,6 +41,8 @@ import java.util.Arrays;
 public class SplashScreen extends Activity {
 
     private Button fbbutton;
+    private boolean is18;
+
 
     // Creating Facebook CallbackManager Value
     public static CallbackManager callbackmanager;
@@ -64,22 +73,8 @@ public class SplashScreen extends Activity {
 
         TextView tv = (TextView) findViewById(R.id.penis);
         rotateText(tv);
-//
-//        final Activity activity = this;
-//        final View content = activity.findViewById(android.R.id.content).getRootView();
-//        if (content.getWidth() > 0) {
-//            Bitmap image = BlurBuilder.blur(content);
-//            getWindow().setBackgroundDrawable(new BitmapDrawable(activity.getResources(), image));
-//        } else {
-//            content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//                @Override
-//                public void onGlobalLayout() {
-//                    Bitmap image = BlurBuilder.blur(content);
-//                    getWindow().setBackgroundDrawable(new BitmapDrawable(activity.getResources(), image));
-//                }
-//            });
-//        }
 
+        checkOver18();
     }
 
     public void rotateText(TextView tv) {
@@ -98,19 +93,33 @@ public class SplashScreen extends Activity {
     // Private method to handle Facebook login and callback
     private void onFblogin() {
 
-        callbackmanager = CallbackManager.Factory.create();
 
-       // Set permissions
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "user_friends", "public_profile"));
+        // Set permissions
+
+        List<String> permissions = new ArrayList<String>();
+        permissions.add("public_profile");
+        permissions.add("user_friends");
+
+
+        LoginManager.getInstance().logInWithReadPermissions(this, permissions);
+
+
+        callbackmanager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackmanager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
 
-                        Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
+                        if (checkOver18()) {
+                            Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
 //                        finish();
-                        startActivity(i);
+                            startActivity(i);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "You need to be 18 or older to use this app", Toast.LENGTH_LONG).show();
+                            LoginManager.getInstance().logOut();
+                        }
+
                     }
 
                     @Override
@@ -124,6 +133,38 @@ public class SplashScreen extends Activity {
                     }
                 });
     }
+
+
+    private boolean checkOver18() {
+        GraphRequest request = GraphRequest.newMeRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject object,
+                            GraphResponse response) {
+                        try {
+                            String id = object.getString("id");
+                            String s = object.getString("age_range");
+
+                            if (s.equals("{\"min\":21}") || s.equals("{\"min\":18}")) {
+                                setIs18(true);
+                            } else setIs18(false);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name, age_range");
+        request.setParameters(parameters);
+        request.executeAsync();
+
+        return is18;
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -139,13 +180,8 @@ public class SplashScreen extends Activity {
         if (AccessToken.getCurrentAccessToken() != null)
             loggedIn = true;
 
-        return AccessToken.getCurrentAccessToken()!= null;
+        return AccessToken.getCurrentAccessToken() != null;
     }
-
-
-
-
-
 
 
     public void getHashKey() {
@@ -163,5 +199,9 @@ public class SplashScreen extends Activity {
         } catch (NoSuchAlgorithmException e) {
             Log.e("no such an algorithm", e.toString());
         }
+    }
+
+    public void setIs18(boolean is18) {
+        this.is18 = is18;
     }
 }

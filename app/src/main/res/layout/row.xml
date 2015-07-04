@@ -9,13 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
-        <!--<com.facebook.login.widget.ProfilePictureView-->
-            <!--android:id="@+id/friendPic"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:padding="5sp"-->
-            <!--facebook:preset_size="small"/>-->
+        <com.facebook.login.widget.ProfilePictureView
+            android:id="@+id/profilePicture"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            facebook:preset_size="small" />
+
+
         <ImageView
             android:id="@+id/friendsPic"
             android:layout_width="wrap_content"
