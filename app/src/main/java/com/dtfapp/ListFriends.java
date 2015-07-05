@@ -3,19 +3,14 @@ package com.dtfapp;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -36,7 +31,7 @@ import java.util.ArrayList;
 /**
  * Created by James on 5/23/2015.
  */
-public class ListOfFriends extends FragmentActivity {
+public class ListFriends extends FragmentActivity {
     private int count;
     private ListView listViewFriends;
     private ArrayList<FriendInfo> friendsInfo = new ArrayList<FriendInfo>();
@@ -49,6 +44,10 @@ public class ListOfFriends extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_friends);
         findFriends();
+
+        View v = (View) findViewById(R.id.background);
+        v.getBackground().setAlpha(70);
+
 
         FragmentManager fm = getFragmentManager();
 //        fm.beginTransaction()
@@ -79,7 +78,6 @@ public class ListOfFriends extends FragmentActivity {
 
 
                                         friendsInfo.add(new FriendInfo(s, id, false, false));
-//                                        Toast.makeText(getApplicationContext(), "id ="+id+"name "+s, Toast.LENGTH_LONG).show();
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -87,14 +85,6 @@ public class ListOfFriends extends FragmentActivity {
                                     }
                                 }
                                 displayFriends();
-
-                                String s = null;
-                                try {
-                                    Toast.makeText(getApplicationContext(), jsonArray.getJSONObject(0).toString(), Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getApplicationContext(), jsonArray.getJSONObject(1).toString(), Toast.LENGTH_SHORT).show();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
 
                             }
                         })
@@ -152,8 +142,6 @@ public class ListOfFriends extends FragmentActivity {
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-
 
                         }
                     }

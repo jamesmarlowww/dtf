@@ -35,10 +35,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-// try remove java security and using 2nd one
 
-
-public class SplashScreen extends Activity {
+public class StartScreen extends Activity {
 
     private Button fbbutton;
     private boolean is18;
@@ -53,10 +51,10 @@ public class SplashScreen extends Activity {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.start_screen);
 
         if (checkLogin()) {
-            Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
+            Intent i = new Intent(StartScreen.this, ListFriends.class);
 //            finish();
             startActivity(i);
         }
@@ -75,8 +73,6 @@ public class SplashScreen extends Activity {
         rotateText(tv);
 
         checkOver18();
-
-        getHashKey();
 
     }
 
@@ -115,7 +111,7 @@ public class SplashScreen extends Activity {
                     public void onSuccess(LoginResult loginResult) {
 
                         if (checkOver18()) {
-                            Intent i = new Intent(SplashScreen.this, ListOfFriends.class);
+                            Intent i = new Intent(StartScreen.this, ListFriends.class);
 //                        finish();
                             startActivity(i);
                         } else {

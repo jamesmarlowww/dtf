@@ -2,10 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:background="@color/dark_green"
+    android:background="@drawable/hands_cropped_start"
+    android:id="@+id/startBackground"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
-
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
@@ -31,8 +32,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
+        android:text="Down to"
         android:padding="25dp"
+        android:textStyle="bold"
         android:textSize="35sp"
         android:textColor="#ffffff"
         android:id="@+id/textView"
@@ -43,12 +45,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="down to ..........?"
+        android:text="down to hangout? down to date?"
         android:textSize="20sp"
         android:textColor="#ffffff"
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:id="@+id/textView2" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="down to .......?"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/textView3" />
 
 
 

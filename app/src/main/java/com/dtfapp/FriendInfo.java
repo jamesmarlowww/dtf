@@ -18,7 +18,6 @@ public class FriendInfo {
         this.image = image;
         this.youLikeThem = youLikeThem;
         this.theyLikeYou = theyLikeYou;
-
     }
 
     public String getFriendName() {
@@ -28,11 +27,6 @@ public class FriendInfo {
     public String getId() {
         return id;
     }
-
-//    public String getIdStr() {
-//        return Integer.toString(id);
-////    }
-
 
     public Bitmap getBitmap() {
         return image;

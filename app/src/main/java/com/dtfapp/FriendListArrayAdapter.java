@@ -134,6 +134,11 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
         }
     }
 
+    class ViewHolder{
+        ImageView friendPic;
+        TextView friendName;
+    }
+
 
     @Override
     public int getCount() {

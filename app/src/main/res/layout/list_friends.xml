@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/background"
     android:orientation="vertical"
+    android:background="@drawable/hands_cropped"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
      >
-    <Button
-        android:id="@+id/addBtn"
-        android:text="Add New Item"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="addItems"/>
+    <!--<Button-->
+        <!--android:id="@+id/addBtn"-->
+        <!--android:text="Add New Item"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="addItems"/>-->
 
     <ListView
         android:id="@+id/listFriends"
