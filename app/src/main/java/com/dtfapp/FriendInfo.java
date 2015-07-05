@@ -7,12 +7,12 @@ import android.graphics.Bitmap;
  */
 public class FriendInfo {
     private String friendName;
-    private int id;
+    private String id;
     private Bitmap image;
     private boolean youLikeThem;
     private boolean theyLikeYou;
 
-    public FriendInfo(String name, int id, boolean youLikeThem, boolean theyLikeYou) {
+    public FriendInfo(String name, String id, boolean youLikeThem, boolean theyLikeYou) {
         friendName = name;
         this.id = id;
         this.image = image;
@@ -25,13 +25,13 @@ public class FriendInfo {
         return friendName;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public String getIdStr() {
-        return Integer.toString(id);
-    }
+//    public String getIdStr() {
+//        return Integer.toString(id);
+////    }
 
 
     public Bitmap getBitmap() {

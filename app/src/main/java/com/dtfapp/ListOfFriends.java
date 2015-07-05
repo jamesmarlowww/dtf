@@ -1,7 +1,9 @@
 package com.dtfapp;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -48,8 +50,11 @@ public class ListOfFriends extends FragmentActivity {
         setContentView(R.layout.list_friends);
         findFriends();
 
-        getUserInfo();
-
+        FragmentManager fm = getFragmentManager();
+//        fm.beginTransaction()
+//                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+//                .show(fm.findFragmentById(R.id.frag))
+//                .commit();
     }
 
 
@@ -70,14 +75,14 @@ public class ListOfFriends extends FragmentActivity {
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     try {
                                         String s = jsonArray.getJSONObject(i).getString("name");
-                                        int id = jsonArray.getJSONObject(i).getInt("id");
+                                        String id = jsonArray.getJSONObject(i).getString("id");
+
 
                                         friendsInfo.add(new FriendInfo(s, id, false, false));
-
+//                                        Toast.makeText(getApplicationContext(), "id ="+id+"name "+s, Toast.LENGTH_LONG).show();
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                                         Log.e("error", e.toString());
                                     }
                                 }
@@ -85,11 +90,11 @@ public class ListOfFriends extends FragmentActivity {
 
                                 String s = null;
                                 try {
-                                    s = jsonArray.getJSONObject(1).toString();
+                                    Toast.makeText(getApplicationContext(), jsonArray.getJSONObject(0).toString(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), jsonArray.getJSONObject(1).toString(), Toast.LENGTH_SHORT).show();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
 
                             }
                         })
@@ -120,7 +125,7 @@ public class ListOfFriends extends FragmentActivity {
 
         Bitmap bitmap = null;
         try {
-            URL imgUrl = new URL("https://graph.facebook.com/" + Integer.toString(id) + "/picture/?type=small"); //removed
+            URL imgUrl = new URL("https://graph.facebook.com/" + Integer.toString(id) + "/picture/?type=small");
             InputStream in = (InputStream) imgUrl.getContent();
             bitmap = BitmapFactory.decodeStream(in);
         } catch (IOException e) {
@@ -128,8 +133,6 @@ public class ListOfFriends extends FragmentActivity {
         }
         return bitmap;
     }
-
-
 
 
     private void getUserInfo() {
@@ -146,7 +149,6 @@ public class ListOfFriends extends FragmentActivity {
                         try {
                             String id = object.getString("id");
                             String s = object.getString("age_range");
-                            Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

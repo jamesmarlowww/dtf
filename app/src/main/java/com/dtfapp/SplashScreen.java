@@ -75,6 +75,9 @@ public class SplashScreen extends Activity {
         rotateText(tv);
 
         checkOver18();
+
+        getHashKey();
+
     }
 
     public void rotateText(TextView tv) {
