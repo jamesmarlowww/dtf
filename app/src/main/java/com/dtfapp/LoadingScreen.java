@@ -22,7 +22,6 @@ public class LoadingScreen extends Fragment {
         TextView tv = (TextView) view.findViewById(R.id.penisText);
 
         rotateText(tv);
-
         return  view;
     }
 

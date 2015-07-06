@@ -8,16 +8,18 @@ import android.graphics.Bitmap;
 public class FriendInfo {
     private String friendName;
     private String id;
-    private Bitmap image;
-    private boolean youLikeThem;
-    private boolean theyLikeYou;
+    private boolean youTick;
+    private boolean youHeart;
+    private boolean theyTick;
+    private boolean theyHeart;
 
-    public FriendInfo(String name, String id, boolean youLikeThem, boolean theyLikeYou) {
+    public FriendInfo(String name, String id, boolean youLikeThem, boolean theyLikeYou, boolean theyTick, boolean theyHeart) {
         friendName = name;
         this.id = id;
-        this.image = image;
-        this.youLikeThem = youLikeThem;
-        this.theyLikeYou = theyLikeYou;
+        this.youTick = youLikeThem;
+        this.youHeart = theyLikeYou;
+        this.theyTick = theyTick;
+        this.theyHeart = theyHeart;
     }
 
     public String getFriendName() {
@@ -28,7 +30,19 @@ public class FriendInfo {
         return id;
     }
 
-    public Bitmap getBitmap() {
-        return image;
+    public boolean isYouTick() {
+        return youTick;
+    }
+
+    public boolean isYouHeart() {
+        return youHeart;
+    }
+
+    public boolean isTheyTick() {
+        return theyTick;
+    }
+
+    public boolean isTheyHeart() {
+        return theyHeart;
     }
 }

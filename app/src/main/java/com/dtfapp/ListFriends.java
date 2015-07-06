@@ -59,11 +59,11 @@ public class ListFriends extends FragmentActivity {
         findFriends();
 
         View v = (View) findViewById(R.id.background);
-        v.getBackground().setAlpha(70);
+        v.getBackground().setAlpha(40);
 
 
         new Timer().schedule(new TimerTask() {
-            @Overridegit
+            @Override
             public void run() {
                 // runs after 3 seconds
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
@@ -94,7 +94,7 @@ public class ListFriends extends FragmentActivity {
                                         String id = jsonArray.getJSONObject(i).getString("id");
 
 
-                                        friendsInfo.add(new FriendInfo(s, id, false, false));
+                                        friendsInfo.add(new FriendInfo(s, id, false, true, true, true));
 
                                     } catch (Exception e) {
                                         e.printStackTrace();

@@ -17,22 +17,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/penis"-->
-        <!--android:textColor="#ffffff"-->
-        <!--android:id="@+id/penis"-->
-        <!--android:textSize="20sp"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_centerVertical="true"-->
-
-         <!--/>-->
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Down to"
+        android:text="@string/down_to"
         android:padding="25dp"
         android:textStyle="bold"
         android:textSize="35sp"
@@ -45,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="down to hangout? down to date?"
+        android:text="@string/down_to_example"
         android:textSize="20sp"
         android:textColor="#ffffff"
         android:layout_below="@+id/textView"
@@ -55,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="down to .......?"
+        android:text="@string/down_to_with_dots"
         android:textSize="20sp"
         android:textColor="#ffffff"
         android:layout_below="@+id/textView2"

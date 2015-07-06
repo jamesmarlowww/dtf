@@ -5,11 +5,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,12 +65,32 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
             viewHolder.friendName = (TextView) rowView.findViewById(R.id.friendsName);
             viewHolder.friendPic = (ImageView) rowView.findViewById(R.id.friendsPic);
+            viewHolder.tick = (ImageView) rowView.findViewById(R.id.tick);
+            viewHolder.heart = (ImageView) rowView.findViewById(R.id.heart);
+            viewHolder.tick2 = (ImageView) rowView.findViewById(R.id.tick2);
+            viewHolder.heart2 = (ImageView) rowView.findViewById(R.id.heart2);
+
 
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.friendName.setText(friendList.get(pos).getFriendName());
         new DownloadImage().execute(new MyTaskParams(friendList.get(pos).getId(), viewHolder.friendPic));
+
+        if(friendList.get(pos).isYouTick()) {
+            viewHolder.tick.setColorFilter(Color.parseColor("#76c720"));
+            if(friendList.get(pos).isTheyTick()) {
+                viewHolder.tick2.setColorFilter(Color.parseColor("#76c720"));
+                viewHolder.tick2.setVisibility(View.VISIBLE);
+            }
+        }
+        if(friendList.get(pos).isYouHeart()) {
+            viewHolder.heart.setColorFilter(Color.parseColor("#D32F2F"));
+            if(friendList.get(pos).isTheyHeart()) {
+                viewHolder.heart2.setColorFilter(Color.parseColor("#D32F2F"));
+                viewHolder.heart2.setVisibility(View.VISIBLE);
+            }
+        }
 
         return rowView;
     }
@@ -109,9 +131,10 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
         @Override
         protected void onPostExecute(Void result) {
-            imageView.setImageBitmap(getRoundedBitmap(bitmap));
+            imageView.setImageBitmap(getCroppedBitmap(bitmap));
         }
 
+        //more rectangle images are distorted. So not ideal, but is slightly larger
         public Bitmap getRoundedBitmap(Bitmap bitmap) {
             Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
                     .getHeight(), Bitmap.Config.ARGB_8888);
@@ -129,7 +152,25 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
             canvas.drawBitmap(bitmap, rect, rect, paint);
+            return output;
+        }
+        //is a circle, slightly smaller
+        public Bitmap getCroppedBitmap(Bitmap bitmap) {
+            Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                    bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(output);
 
+            final int color = 0xff424242;
+            final Paint paint = new Paint();
+            final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+            paint.setAntiAlias(true);
+            canvas.drawARGB(0, 0, 0, 0);
+            paint.setColor(color);
+            canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                    bitmap.getWidth() / 2, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, rect, rect, paint);
             return output;
         }
     }
@@ -137,6 +178,11 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     class ViewHolder{
         ImageView friendPic;
         TextView friendName;
+        ImageView tick;
+        ImageView heart;
+        ImageView tick2;
+        ImageView heart2;
+
     }
 
 

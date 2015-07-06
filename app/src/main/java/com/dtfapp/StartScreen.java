@@ -72,7 +72,7 @@ public class StartScreen extends Activity {
 //        TextView tv = (TextView) findViewById(R.id.penis);
 //        rotateText(tv);
 
-        checkOver18();
+//        checkOver18();
 
     }
 
@@ -124,11 +124,15 @@ public class StartScreen extends Activity {
                     @Override
                     public void onCancel() {
                         Log.d("on Cancel", "On cancel");
+                        Toast.makeText(getApplicationContext(), "hmm something went wrong. Check your internet", Toast.LENGTH_LONG).show();
+
                     }
 
                     @Override
                     public void onError(FacebookException error) {
                         Log.d("on error ", error.toString());
+
+                        Toast.makeText(getApplicationContext(), "hmm something went wrong. Check your internet", Toast.LENGTH_LONG).show();
                     }
                 });
     }

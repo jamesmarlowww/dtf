@@ -1,5 +1,8 @@
 <resources>
     <color name="background_green">#7ed321</color>
-    <color name="text_green">#76c720</color>
     <color name="dark_green">#009933</color>
+
+    <color name="heart_red">#D32F2F</color>
+    <color name="tick_green">#76c720</color>
+
 </resources>

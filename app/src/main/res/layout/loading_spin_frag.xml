@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@drawable/hands_cropped_no_filter"
     android:id="@+id/frag"
-    >
-
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/hands_cropped_no_filter">
 
     <TextView
+        android:id="@+id/penisText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/penis"
-        android:textColor="#ffffff"
-        android:id="@+id/penisText"
-        android:src="@string/penis"
-        android:textSize="20sp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-
+        android:src="@string/penis"
+        android:text="@string/penis"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
         />
-
-
 
 </RelativeLayout>
