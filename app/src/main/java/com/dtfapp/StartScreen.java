@@ -69,8 +69,8 @@ public class StartScreen extends Activity {
         });
 
 
-        TextView tv = (TextView) findViewById(R.id.penis);
-        rotateText(tv);
+//        TextView tv = (TextView) findViewById(R.id.penis);
+//        rotateText(tv);
 
         checkOver18();
 

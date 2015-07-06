@@ -18,23 +18,24 @@ public class LoadingScreen extends Fragment {
     ViewGroup mRootview;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup mRootview = (ViewGroup) inflater.inflate(R.layout.loading_spin_frag, container, false);
+        View view = inflater.inflate(R.layout.loading_spin_frag, container, false);
+        TextView tv = (TextView) view.findViewById(R.id.penisText);
 
-        TextView penis = (TextView) mRootview.findViewById(R.id.penisText);
-//        RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
-        //rotate from center
-//        RotateAnimation anim = new RotateAnimation(0f, 350f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateText(tv);
 
-//        anim.setInterpolator(new LinearInterpolator());
-//        anim.setRepeatCount(Animation.INFINITE);
-//        anim.setDuration(700);
-//        penis.startAnimation(anim);
-        return mRootview;
+        return  view;
     }
 
-    public void closeFrag(){
-        ((ViewGroup)mRootview.getParent()).removeView(mRootview);
+    public void rotateText(TextView tv) {
+        //rotate from the start of string
+        RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setDuration(700);
+        tv.startAnimation(anim);
     }
+
+
 
 
 }

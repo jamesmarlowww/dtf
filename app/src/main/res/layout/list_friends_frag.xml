@@ -7,12 +7,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
      >
-    <!--<Button-->
-        <!--android:id="@+id/addBtn"-->
-        <!--android:text="Add New Item"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:onClick="addItems"/>-->
+
+
 
     <ListView
         android:id="@+id/listFriends"

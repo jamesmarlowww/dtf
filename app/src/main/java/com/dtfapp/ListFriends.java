@@ -3,6 +3,7 @@ package com.dtfapp;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by James on 5/23/2015.
@@ -36,24 +39,38 @@ public class ListFriends extends FragmentActivity {
     private ListView listViewFriends;
     private ArrayList<FriendInfo> friendsInfo = new ArrayList<FriendInfo>();
     private boolean hasFriends;
-    CallbackManager callbackManager;
+    FragmentManager fragmentManager;
+    LoadingScreen loadingScreen;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_friends);
+        setContentView(R.layout.list_friends_frag);
+
+        fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Configuration configInfo = getResources().getConfiguration();
+
+        loadingScreen = new LoadingScreen();
+        fragmentTransaction.replace(android.R.id.content, loadingScreen);
+        fragmentTransaction.commit();
+
         findFriends();
 
         View v = (View) findViewById(R.id.background);
         v.getBackground().setAlpha(70);
 
 
-        FragmentManager fm = getFragmentManager();
-//        fm.beginTransaction()
-//                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-//                .show(fm.findFragmentById(R.id.frag))
-//                .commit();
+        new Timer().schedule(new TimerTask() {
+            @Overridegit
+            public void run() {
+                // runs after 3 seconds
+                fragmentManager.beginTransaction().remove(loadingScreen).commit();
+
+            }
+        }, 3000);
+
     }
 
 
