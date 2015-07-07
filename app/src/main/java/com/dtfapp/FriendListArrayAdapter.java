@@ -70,6 +70,38 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
             viewHolder.tick2 = (ImageView) rowView.findViewById(R.id.tick2);
             viewHolder.heart2 = (ImageView) rowView.findViewById(R.id.heart2);
 
+            viewHolder.tick.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("It works", "inside tick");
+
+                }
+            });
+
+            viewHolder.heart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("It works", "inside heart");
+
+                }
+            });
+
+            viewHolder.tick2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("It works", "inside tick");
+
+                }
+            });
+
+            viewHolder.heart2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("It works", "inside heart");
+
+                }
+            });
+
 
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

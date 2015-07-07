@@ -43,6 +43,12 @@ public class ListFriends extends FragmentActivity {
     LoadingScreen loadingScreen;
 
 
+    /**
+     * need to link to for image http://icons8.com
+     * @param savedInstanceState
+     */
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +65,7 @@ public class ListFriends extends FragmentActivity {
         findFriends();
 
         View v = (View) findViewById(R.id.background);
-        v.getBackground().setAlpha(40);
+        v.getBackground().setAlpha(20);
 
 
         new Timer().schedule(new TimerTask() {
@@ -94,7 +100,7 @@ public class ListFriends extends FragmentActivity {
                                         String id = jsonArray.getJSONObject(i).getString("id");
 
 
-                                        friendsInfo.add(new FriendInfo(s, id, false, true, true, true));
+                                        friendsInfo.add(new FriendInfo(s, id, true, true, true, true));
 
                                     } catch (Exception e) {
                                         e.printStackTrace();

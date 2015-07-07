@@ -32,12 +32,12 @@
             android:layout_height="wrap_content"
             android:onClick="tickPressed"
             android:id="@+id/tick"
-            android:src="@drawable/ic_done_black_36dp"
+            android:src="@drawable/household_bed_icon"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="60dp"
-            android:layout_marginEnd="60dp" />
+            android:layout_marginRight="70dp"
+            android:layout_marginEnd="70dp" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,13 +54,13 @@
             android:layout_height="wrap_content"
             android:onClick="tickPressed"
             android:id="@+id/tick2"
-            android:src="@drawable/ic_done_black_36dp"
+            android:src="@drawable/household_bed_icon"
             android:layout_centerVertical="true"
             android:visibility="gone"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="70dp"
-            android:layout_marginEnd="70dp" />
+            android:layout_marginRight="78dp"
+            android:layout_marginEnd="78dp" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

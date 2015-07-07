@@ -45,6 +45,8 @@ public class StartScreen extends Activity {
     // Creating Facebook CallbackManager Value
     public static CallbackManager callbackmanager;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
