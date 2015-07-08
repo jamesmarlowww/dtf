@@ -1,33 +1,35 @@
 package com.dtfapp;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
+import com.parse.FindCallback;
+import com.parse.LogInCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,15 +38,21 @@ import java.util.TimerTask;
  */
 public class ListFriends extends FragmentActivity {
     private int count;
+    public ParseUser parseUser;
+    private String myId;
     private ListView listViewFriends;
     private ArrayList<FriendInfo> friendsInfo = new ArrayList<FriendInfo>();
     private boolean hasFriends;
+    private boolean youLike;
+    private boolean youLove;
     FragmentManager fragmentManager;
     LoadingScreen loadingScreen;
 
+    //rosid id 100000479237442
 
     /**
      * need to link to for image http://icons8.com
+     *
      * @param savedInstanceState
      */
 
@@ -62,7 +70,13 @@ public class ListFriends extends FragmentActivity {
         fragmentTransaction.replace(android.R.id.content, loadingScreen);
         fragmentTransaction.commit();
 
-        findFriends();
+        Parse.initialize(this, "LD9q9E8DBtXQGetITICyXpW9yVVR3ZSEscEvKDfW", "CCTYV5PIHxQ7HG3avmXBl8fu62XKrBWRdEC8xvAg");
+
+
+        //follow this method to log into parse then get fb frends
+        getUserId();
+
+
 
         View v = (View) findViewById(R.id.background);
         v.getBackground().setAlpha(20);
@@ -96,11 +110,31 @@ public class ListFriends extends FragmentActivity {
 
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     try {
-                                        String s = jsonArray.getJSONObject(i).getString("name");
-                                        String id = jsonArray.getJSONObject(i).getString("id");
+                                        final String s = jsonArray.getJSONObject(i).getString("name");
+                                        final String id = jsonArray.getJSONObject(i).getString("id");
+
+//                                       // set up our query for the Book object
+                                        ParseQuery likedQuery = ParseQuery.getQuery("liked");
+                                        ParseQuery lovedQuery = ParseQuery.getQuery("loved");
+
+                                        setYouLike(false);
+                                        setYouLove(false);
+                                        likedQuery.findInBackground(new FindCallback<ParseObject>() {
+                                            public void done(List<ParseObject> list, ParseException e) {
+                                                if(list.contains(id))
+                                                    setYouLike(true);
+                                            }
+                                        });
+                                        lovedQuery.findInBackground(new FindCallback<ParseObject>() {
+                                            public void done(List<ParseObject> list, ParseException e) {
+                                                if(list.contains(id))
+                                                    setYouLike(true);
+                                            }
+                                        });
+
+                                        friendsInfo.add(new FriendInfo(s, id, isYouLike(), isYouLove(), false, false));
 
 
-                                        friendsInfo.add(new FriendInfo(s, id, true, true, true, true));
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -134,22 +168,57 @@ public class ListFriends extends FragmentActivity {
 
     }
 
-    public Bitmap getDpImage(int id) throws MalformedURLException {
+    public void logInParse(String uid) throws ParseException {
+        ParseUser user = new ParseUser();
+        user.setUsername(uid);
+        user.setPassword(uid);
+//        user.setEmail("email@example.com");
 
-        Bitmap bitmap = null;
-        try {
-            URL imgUrl = new URL("https://graph.facebook.com/" + Integer.toString(id) + "/picture/?type=small");
-            InputStream in = (InputStream) imgUrl.getContent();
-            bitmap = BitmapFactory.decodeStream(in);
-        } catch (IOException e) {
-            Log.e("Error", e.toString());
-        }
-        return bitmap;
+        parseUser = user;
+        user.logInInBackground(uid, uid, new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (e == null && user != null) {
+                    makeToast("Login in successfull", Toast.LENGTH_LONG);
+
+                    //finds the facebook friends
+                    user.add("liked", "100000479237442");
+
+                    findFriends();
+
+
+
+
+
+                } else {
+
+                    siginUpToParse(user);
+                }
+            }
+        });
+
+
+    }
+
+    private void siginUpToParse(ParseUser user) {
+        user.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if (e == null) {
+                    // Hooray! Let them use the app now.
+
+                } else {
+                    // Sign up didn't succeed. Look at the ParseException
+                    // to figure out what went wrong
+                    makeToast("Something went wrong. Try checking your internet", Toast.LENGTH_LONG);
+
+                }
+            }
+
+        });
     }
 
 
-    private void getUserInfo() {
-
+    private void getUserId() {
         GraphRequest request = GraphRequest.newMeRequest(
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
@@ -161,12 +230,20 @@ public class ListFriends extends FragmentActivity {
 
                         try {
                             String id = object.getString("id");
-                            String s = object.getString("age_range");
+//                            String s = object.getString("age_range");
+
+                            //follow this method
+                            logInParse(id);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            makeToast("something went wrong", Toast.LENGTH_LONG);
 
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
+
+
                     }
                 });
         Bundle parameters = new Bundle();
@@ -193,21 +270,12 @@ public class ListFriends extends FragmentActivity {
     }
 
 
-    public void showHideFrgament(final Fragment fragment) {
+    public void setMyId(String myId) {
+        this.myId = myId;
+    }
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in,
-                android.R.animator.fade_out);
-
-        if (fragment.isHidden()) {
-            ft.show(fragment);
-            Log.d("hidden", "Show");
-        } else {
-            ft.hide(fragment);
-            Log.d("Shown", "Hide");
-        }
-        ft.commit();
-
+    public void makeToast(String s, int len) {
+        Toast.makeText(getApplicationContext(), s, len).show();
     }
 
     public void setHasFriends(boolean hasFriends) {
@@ -218,5 +286,19 @@ public class ListFriends extends FragmentActivity {
         return hasFriends;
     }
 
+    public void setYouLike(boolean youLike) {
+        this.youLike = youLike;
+    }
 
+    public boolean isYouLike() {
+        return youLike;
+    }
+
+    public boolean isYouLove() {
+        return youLove;
+    }
+
+    public void setYouLove(boolean youLove) {
+        this.youLove = youLove;
+    }
 }
