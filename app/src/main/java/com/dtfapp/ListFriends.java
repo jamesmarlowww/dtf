@@ -16,6 +16,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -77,7 +78,6 @@ public class ListFriends extends FragmentActivity {
         getUserId();
 
 
-
         View v = (View) findViewById(R.id.background);
         v.getBackground().setAlpha(20);
 
@@ -87,64 +87,79 @@ public class ListFriends extends FragmentActivity {
             public void run() {
                 // runs after 3 seconds
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
-
             }
         }, 3000);
 
     }
 
+    public void addRelationship(String id, boolean liked, boolean loved) {
+        ParseObject relationship = new ParseObject("relationship");
+        relationship.put("id_of_friend", id);
+        relationship.put("liked", liked);
+        relationship.put("loved", loved);
+        relationship.saveInBackground();
+    }
 
     public boolean findFriends() {
+
         GraphRequestBatch batch = new GraphRequestBatch(
-                GraphRequest.newMyFriendsRequest(
-                        AccessToken.getCurrentAccessToken(),
-                        new GraphRequest.GraphJSONArrayCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONArray jsonArray,
-                                    GraphResponse response) {
-                                // Application code for users friends
 
-                                if (jsonArray.length() > 0) setHasFriends(true);
-                                else setHasFriends(false);
+        GraphRequest.newMyFriendsRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONArrayCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONArray jsonArray,
+                            GraphResponse response) {
+                        // Application code for users friends
 
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    try {
-                                        final String s = jsonArray.getJSONObject(i).getString("name");
-                                        final String id = jsonArray.getJSONObject(i).getString("id");
+                        if (jsonArray.length() > 0) setHasFriends(true);
+                        else setHasFriends(false);
 
-//                                       // set up our query for the Book object
-                                        ParseQuery likedQuery = ParseQuery.getQuery("liked");
-                                        ParseQuery lovedQuery = ParseQuery.getQuery("loved");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            try {
+                                final String s = jsonArray.getJSONObject(i).getString("name");
+                                final String id = jsonArray.getJSONObject(i).getString("id");
 
-                                        setYouLike(false);
-                                        setYouLove(false);
-                                        likedQuery.findInBackground(new FindCallback<ParseObject>() {
-                                            public void done(List<ParseObject> list, ParseException e) {
-                                                if(list.contains(id))
-                                                    setYouLike(true);
+                                setYouLove(false);
+                                setYouLike(false);
+//                                addRelationship(id, true, false);
+
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
+                                query.whereEqualTo("id_of_friend", id);
+                                query.findInBackground(new FindCallback<ParseObject>() {
+
+                                    @Override
+                                    public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                                        if (e == null) {
+                                            for (ParseObject j : objects) {
+                                                setYouLike(j.getBoolean("liked"));
+                                                makeToast(j.getBoolean("liked") + "", Toast.LENGTH_LONG);
+                                                setYouLove(j.getBoolean("loved"));
+                                                makeToast(j.getBoolean("loved") + "", Toast.LENGTH_LONG);
+                                                makeToast(j.getString("id_of_friend"), Toast.LENGTH_LONG);
                                             }
-                                        });
-                                        lovedQuery.findInBackground(new FindCallback<ParseObject>() {
-                                            public void done(List<ParseObject> list, ParseException e) {
-                                                if(list.contains(id))
-                                                    setYouLike(true);
-                                            }
-                                        });
 
-                                        friendsInfo.add(new FriendInfo(s, id, isYouLike(), isYouLove(), false, false));
+                                        } else if (objects.size() > 1) {
+                                            makeToast("repeated friend in db", Toast.LENGTH_LONG);
+                                        } else {
+                                            makeToast(e.toString(), Toast.LENGTH_LONG);
+                                        }
 
-
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        Log.e("error", e.toString());
                                     }
-                                }
-                                displayFriends();
+                                });
+                                friendsInfo.add(new FriendInfo(s, id, true, true, true, true));
 
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.e("error", e.toString());
                             }
-                        })
+                        }
+                        displayFriends();
+
+                    }
+                })
 
         );
         batch.addCallback(new GraphRequestBatch.Callback() {
@@ -168,6 +183,28 @@ public class ListFriends extends FragmentActivity {
 
     }
 
+    private void getFriendsList(String user)
+    {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("friendship");
+        query.whereEqualTo("user1", user);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject j : objects) {
+//                        friendsList.add(j.getString("user2"));
+                    }
+
+                } else {
+//                    debugPopUp("e.getMessage(): ", e.getMessage().toString());
+                }
+
+            }
+        });
+    }
+
     public void logInParse(String uid) throws ParseException {
         ParseUser user = new ParseUser();
         user.setUsername(uid);
@@ -181,12 +218,9 @@ public class ListFriends extends FragmentActivity {
                     makeToast("Login in successfull", Toast.LENGTH_LONG);
 
                     //finds the facebook friends
-                    user.add("liked", "100000479237442");
+
 
                     findFriends();
-
-
-
 
 
                 } else {
