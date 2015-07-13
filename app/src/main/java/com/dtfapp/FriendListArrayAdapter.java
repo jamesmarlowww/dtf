@@ -11,7 +11,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,21 +19,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.Profile;
-import com.facebook.login.widget.ProfilePictureView;
+import com.parse.ParseObject;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 /**
@@ -43,18 +34,20 @@ import java.util.ArrayList;
 public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     private int resourceID = 0; // number in list. 0,1,2,3
     private Context context;
+    private String myId;
     private ArrayList<FriendInfo> friendList = new ArrayList<FriendInfo>();
 
-    public FriendListArrayAdapter(Context context, int resource, ArrayList<FriendInfo> friendList) {
+    public FriendListArrayAdapter(Context context, int resource, ArrayList<FriendInfo> friendList, String myId) {
         super(context, resource, friendList);
         this.context = context;
         resourceID = resource;
+        this.myId = myId;
         this.friendList = friendList;
 
     }
 
     @Override
-    public View getView(int pos, View convertView, ViewGroup parent) {
+    public View getView(final int pos, View convertView, ViewGroup parent) {
         View rowView = convertView;
         ViewHolder viewHolder = new ViewHolder();
         int rowType = getItemViewType(pos);
@@ -74,6 +67,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside tick");
+                    relationshipExists();
+                    addRelationship(friendList.get(pos).getId(), true, false);
 
                 }
             });
@@ -82,6 +77,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside heart");
+                    relationshipExists();
+                    addRelationship(friendList.get(pos).getId(), true, true);
 
                 }
             });
@@ -90,7 +87,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside tick");
-
+                    relationshipExists();
+                    addRelationship(friendList.get(pos).getId(), true, false);
                 }
             });
 
@@ -98,6 +96,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside heart");
+                    relationshipExists();
+                    addRelationship(friendList.get(pos).getId(), true, true);
 
                 }
             });
@@ -106,9 +106,14 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
         viewHolder.friendName.setText(friendList.get(pos).getFriendName());
+
+        //calls the aysnc task. So the main thread doesn't have to wait for the internet download of pic
         new DownloadImage().execute(new MyTaskParams(friendList.get(pos).getId(), viewHolder.friendPic));
 
+        //sets the color of the icon.
+        //adds the duplicate icon if both friends like/love
         if(friendList.get(pos).isYouTick()) {
             viewHolder.tick.setColorFilter(Color.parseColor("#76c720"));
             if(friendList.get(pos).isTheyTick()) {
@@ -136,6 +141,24 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
             this.imageView = imageView;
 
         }
+    }
+
+    /**
+     * If the relationship exists delete the row and return true.
+     * else return false
+     * @return
+     */
+    private boolean relationshipExists() {
+
+        return false;
+    }
+    public void addRelationship(String id_of_friend, boolean liked, boolean loved) {
+        ParseObject relationship = new ParseObject("relationship");
+        relationship.put("my_id", myId);
+        relationship.put("id_of_friend", id_of_friend);
+        relationship.put("liked", liked);
+        relationship.put("loved", loved);
+        relationship.saveInBackground();
     }
 
     private class DownloadImage extends AsyncTask<MyTaskParams, Void, Void> {

@@ -13,10 +13,10 @@ import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -48,6 +48,8 @@ public class ListFriends extends FragmentActivity {
     private boolean youLove;
     FragmentManager fragmentManager;
     LoadingScreen loadingScreen;
+    private ArrayHolder myRelationshipArrays;
+    private ArrayHolder myFriendsRelationShipArray;
 
     //rosid id 100000479237442
 
@@ -71,6 +73,7 @@ public class ListFriends extends FragmentActivity {
         fragmentTransaction.replace(android.R.id.content, loadingScreen);
         fragmentTransaction.commit();
 
+
         Parse.initialize(this, "LD9q9E8DBtXQGetITICyXpW9yVVR3ZSEscEvKDfW", "CCTYV5PIHxQ7HG3avmXBl8fu62XKrBWRdEC8xvAg");
 
 
@@ -78,6 +81,7 @@ public class ListFriends extends FragmentActivity {
         getUserId();
 
 
+        //makes the backround transparent
         View v = (View) findViewById(R.id.background);
         v.getBackground().setAlpha(20);
 
@@ -89,7 +93,6 @@ public class ListFriends extends FragmentActivity {
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
             }
         }, 3000);
-
     }
 
     public void addRelationship(String id, boolean liked, boolean loved) {
@@ -101,65 +104,41 @@ public class ListFriends extends FragmentActivity {
     }
 
     public boolean findFriends() {
-
         GraphRequestBatch batch = new GraphRequestBatch(
+                GraphRequest.newMyFriendsRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONArrayCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONArray jsonArray,
+                                    GraphResponse response) {
+                                // Application code for users friends
 
-        GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONArrayCallback() {
-                    @Override
-                    public void onCompleted(
-                            JSONArray jsonArray,
-                            GraphResponse response) {
-                        // Application code for users friends
+                                if (jsonArray.length() > 0) setHasFriends(true);
+                                else setHasFriends(false);
 
-                        if (jsonArray.length() > 0) setHasFriends(true);
-                        else setHasFriends(false);
 
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            try {
-                                final String s = jsonArray.getJSONObject(i).getString("name");
-                                final String id = jsonArray.getJSONObject(i).getString("id");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    try {
+                                        final String name = jsonArray.getJSONObject(i).getString("name");
+                                        final String id = jsonArray.getJSONObject(i).getString("id");
 
-                                setYouLove(false);
-                                setYouLike(false);
-//                                addRelationship(id, true, false);
+                                        friendsInfo.add(new FriendInfo(name, id,
+                                                myRelationshipArrays.liked.contains(id),
+                                                myRelationshipArrays.loved.contains(id),
+                                                myFriendsRelationShipArray.liked.contains(id),
+                                                myFriendsRelationShipArray.loved.contains(id)));
 
-                                ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
-                                query.whereEqualTo("id_of_friend", id);
-                                query.findInBackground(new FindCallback<ParseObject>() {
 
-                                    @Override
-                                    public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                                        if (e == null) {
-                                            for (ParseObject j : objects) {
-                                                setYouLike(j.getBoolean("liked"));
-                                                makeToast(j.getBoolean("liked") + "", Toast.LENGTH_LONG);
-                                                setYouLove(j.getBoolean("loved"));
-                                                makeToast(j.getBoolean("loved") + "", Toast.LENGTH_LONG);
-                                                makeToast(j.getString("id_of_friend"), Toast.LENGTH_LONG);
-                                            }
-
-                                        } else if (objects.size() > 1) {
-                                            makeToast("repeated friend in db", Toast.LENGTH_LONG);
-                                        } else {
-                                            makeToast(e.toString(), Toast.LENGTH_LONG);
-                                        }
-
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        Log.e("error", e.toString());
                                     }
-                                });
-                                friendsInfo.add(new FriendInfo(s, id, true, true, true, true));
+                                }
+                                displayFriends();
 
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.e("error", e.toString());
                             }
-                        }
-                        displayFriends();
-
-                    }
-                })
+                        })
 
         );
         batch.addCallback(new GraphRequestBatch.Callback() {
@@ -180,11 +159,86 @@ public class ListFriends extends FragmentActivity {
 
 
         return isHasFriends();
-
     }
 
-    private void getFriendsList(String user)
-    {
+    //either gets the liked or loved friends based off boolean
+    private void getMyRelationship() {
+        final ArrayHolder multiArray = new ArrayHolder(new ArrayList(), new ArrayList());
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
+        //gets all rows where id = myId
+        query.whereEqualTo("my_id", myId);
+        query.findInBackground(new FindCallback<ParseObject>() {
+
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject j : objects) {
+                        boolean liked = j.getBoolean("liked");
+                        boolean loved = j.getBoolean("loved");
+                        String str = j.getString("id_of_friend");
+
+                        if (liked)
+                            multiArray.liked.add(str);
+
+                        if (loved)
+                            multiArray.loved.add(str);
+                    }
+
+
+                    myRelationshipArrays = multiArray;
+                    getFriendsRelationship();
+
+
+                } else if (objects.size() > 1) {
+                    makeToast("repeated friend in db", Toast.LENGTH_LONG);
+                } else {
+                    makeToast(e.toString(), Toast.LENGTH_LONG);
+                }
+
+            }
+        });
+    }
+
+
+    private void getFriendsRelationship() {
+
+        final ArrayHolder multiArray = new ArrayHolder(new ArrayList(), new ArrayList());
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
+        //gets all rows where id_of_friend = myId
+        query.whereEqualTo("id_of_friend", myId);
+        query.findInBackground(new FindCallback<ParseObject>() {
+
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject j : objects) {
+                        boolean liked = j.getBoolean("liked");
+                        boolean loved = j.getBoolean("loved");
+                        String str = j.getString("my_id");
+
+                        if (liked)
+                            multiArray.liked.add(str);
+
+                        if (loved)
+                            multiArray.loved.add(str);
+
+                    }
+
+                    myFriendsRelationShipArray = multiArray;
+                    findFriends();
+
+                } else if (objects.size() > 1) {
+                    makeToast("repeated friend in db", Toast.LENGTH_LONG);
+                } else {
+                    makeToast(e.toString(), Toast.LENGTH_LONG);
+                }
+
+            }
+        });
+    }
+
+    private void getFriendsList(String user) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("friendship");
         query.whereEqualTo("user1", user);
 
@@ -209,88 +263,77 @@ public class ListFriends extends FragmentActivity {
         ParseUser user = new ParseUser();
         user.setUsername(uid);
         user.setPassword(uid);
-//        user.setEmail("email@example.com");
+        user.setEmail("nah ");
 
         parseUser = user;
         user.logInInBackground(uid, uid, new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
                 if (e == null && user != null) {
-                    makeToast("Login in successfull", Toast.LENGTH_LONG);
 
                     //finds the facebook friends
+//                    findFriends();
 
-
-                    findFriends();
-
+                    getMyRelationship();
 
                 } else {
+//                    signUpToParse(user);
+//                    findFriends();
 
-                    siginUpToParse(user);
+
+                    getMyRelationship();
                 }
+
             }
         });
-
-
     }
 
-    private void siginUpToParse(ParseUser user) {
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    // Hooray! Let them use the app now.
 
-                } else {
-                    // Sign up didn't succeed. Look at the ParseException
-                    // to figure out what went wrong
-                    makeToast("Something went wrong. Try checking your internet", Toast.LENGTH_LONG);
-
-                }
-            }
-
-        });
+    private void signUpToParse(ParseUser user) {
+//        user.signUpInBackground(new SignUpCallback() {
+//            @Override
+//            public void done(com.parse.ParseException e) {
+//                if (e == null) {
+//                    // Hooray! Let them use the app now.
+//
+//                    //need to log in here
+//                    findFriends();
+//
+//                } else {
+//                    // Sign up didn't succeed. Look at the ParseException
+//                    // to figure out what went wrong
+//
+//                }
+//            }
+//
+//        });
     }
 
 
     private void getUserId() {
-        GraphRequest request = GraphRequest.newMeRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        // Application code
+        GraphRequestAsyncTask request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject user, GraphResponse response) {
+                if (user != null) {
+                    try {
+                        myId = user.getString("id");
 
-                        try {
-                            String id = object.getString("id");
-//                            String s = object.getString("age_range");
-
-                            //follow this method
-                            logInParse(id);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            makeToast("something went wrong", Toast.LENGTH_LONG);
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        logInParse(myId);
 
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name, age_range");
-        request.setParameters(parameters);
-        request.executeAsync();
-
+                }
+            }
+        }).executeAsync();
     }
 
     public void displayFriends() {
 
         listViewFriends = (ListView) findViewById(R.id.listFriends);
-        FriendListArrayAdapter friendListAdapter = new FriendListArrayAdapter(this, R.layout.row, friendsInfo);
+        FriendListArrayAdapter friendListAdapter = new FriendListArrayAdapter(this, R.layout.row, friendsInfo, myId);
         listViewFriends.setAdapter(friendListAdapter);
 
         listViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -303,6 +346,15 @@ public class ListFriends extends FragmentActivity {
         });
     }
 
+    private class ArrayHolder {
+        public ArrayList liked;
+        public ArrayList loved;
+
+        public ArrayHolder(ArrayList liked, ArrayList loved) {
+            this.liked = liked;
+            this.loved = loved;
+        }
+    }
 
     public void setMyId(String myId) {
         this.myId = myId;

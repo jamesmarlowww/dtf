@@ -46,7 +46,6 @@ public class StartScreen extends Activity {
     public static CallbackManager callbackmanager;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +73,6 @@ public class StartScreen extends Activity {
 //        TextView tv = (TextView) findViewById(R.id.penis);
 //        rotateText(tv);
 
-//        checkOver18();
 
     }
 
@@ -112,14 +110,14 @@ public class StartScreen extends Activity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
 
-                        if (checkOver18()) {
-                            Intent i = new Intent(StartScreen.this, ListFriends.class);
+
+                        Intent i = new Intent(StartScreen.this, ListFriends.class);
 //                        finish();
-                            startActivity(i);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "You need to be 18 or older to use this app", Toast.LENGTH_LONG).show();
-                            LoginManager.getInstance().logOut();
-                        }
+                        startActivity(i);
+
+//                            Toast.makeText(getApplicationContext(), "You need to be 18 or older to use this app", Toast.LENGTH_LONG).show();
+//                            LoginManager.getInstance().logOut();
+
 
                     }
 
@@ -134,7 +132,7 @@ public class StartScreen extends Activity {
                     public void onError(FacebookException error) {
                         Log.d("on error ", error.toString());
 
-                        Toast.makeText(getApplicationContext(), "hmm something went wrong. Check your internet", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "ERRRRROR: "+error.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
