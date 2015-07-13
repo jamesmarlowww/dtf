@@ -2,6 +2,8 @@ package com.dtfapp;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -74,7 +76,7 @@ public class ListFriends extends FragmentActivity {
         fragmentTransaction.commit();
 
 
-        Parse.initialize(this, "LD9q9E8DBtXQGetITICyXpW9yVVR3ZSEscEvKDfW", "CCTYV5PIHxQ7HG3avmXBl8fu62XKrBWRdEC8xvAg");
+
 
 
         //follow this method to log into parse then get fb frends
@@ -93,6 +95,24 @@ public class ListFriends extends FragmentActivity {
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
             }
         }, 3000);
+
+        final String PREFS_NAME = "MyPrefsFile";
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        if (settings.getBoolean("my_first_time", true)) {
+            //the app is being launched for first time, do something
+            Log.d("Comments", "First time");
+
+            // first time task
+
+            HowToScreen hts = new HowToScreen();
+            fragmentTransaction.replace(android.R.id.content, hts);
+            fragmentTransaction.commit();
+
+            // record the fact that the app has been started at least once
+            settings.edit().putBoolean("my_first_time", false).commit();
+        }
     }
 
     public void addRelationship(String id, boolean liked, boolean loved) {
@@ -278,8 +298,6 @@ public class ListFriends extends FragmentActivity {
                 } else {
 //                    signUpToParse(user);
 //                    findFriends();
-
-
                     getMyRelationship();
                 }
 
@@ -323,6 +341,7 @@ public class ListFriends extends FragmentActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (ParseException e) {
+                        makeToast(e.toString(), Toast.LENGTH_LONG);
                         e.printStackTrace();
                     }
                 }
@@ -382,6 +401,12 @@ public class ListFriends extends FragmentActivity {
 
     public boolean isYouLove() {
         return youLove;
+    }
+
+    public void restartActivity() {
+        Intent i = getIntent();
+        finish();
+        startActivity(i);
     }
 
     public void setYouLove(boolean youLove) {

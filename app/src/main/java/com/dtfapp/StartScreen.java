@@ -26,6 +26,7 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.parse.Parse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,13 +51,16 @@ public class StartScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Parse.initialize(this, "LD9q9E8DBtXQGetITICyXpW9yVVR3ZSEscEvKDfW", "CCTYV5PIHxQ7HG3avmXBl8fu62XKrBWRdEC8xvAg");
+
+
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         setContentView(R.layout.start_screen);
 
         if (checkLogin()) {
             Intent i = new Intent(StartScreen.this, ListFriends.class);
-//            finish();
+            finish();
             startActivity(i);
         }
 

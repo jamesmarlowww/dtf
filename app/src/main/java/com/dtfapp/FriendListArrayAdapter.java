@@ -2,6 +2,7 @@ package com.dtfapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,14 +20,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by James on 6/30/2015.
@@ -67,8 +72,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside tick");
-                    relationshipExists();
-                    addRelationship(friendList.get(pos).getId(), true, false);
+                    relationshipExists(friendList.get(pos).getId(), true, false);
+
 
                 }
             });
@@ -77,8 +82,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside heart");
-                    relationshipExists();
-                    addRelationship(friendList.get(pos).getId(), true, true);
+                    relationshipExists(friendList.get(pos).getId(), true, true);
+
 
                 }
             });
@@ -87,8 +92,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside tick");
-                    relationshipExists();
-                    addRelationship(friendList.get(pos).getId(), true, false);
+                    relationshipExists(friendList.get(pos).getId(), true, false);
+
                 }
             });
 
@@ -96,9 +101,9 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                 @Override
                 public void onClick(View v) {
                     Log.d("It works", "inside heart");
-                    relationshipExists();
-                    addRelationship(friendList.get(pos).getId(), true, true);
+                    relationshipExists(friendList.get(pos).getId(), true, true);
 
+//                    
                 }
             });
 
@@ -144,14 +149,63 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     }
 
     /**
-     * If the relationship exists delete the row and return true.
-     * else return false
+     * If the relationship exists delete the row
+     * if the new relationship is exactly the same. Only delete the row (i.e if heart is hightlighted, the same press on it removes it)
+     * else remove the old row and add the new relationship
+     *
+     *
+     *
      * @return
      */
-    private boolean relationshipExists() {
+    private boolean relationshipExists(final String friend_id, final boolean liked, final boolean loved) {
+        final boolean[] result = {false};
 
-        return false;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
+        //gets all rows where id = myId
+        query.whereEqualTo("my_id", myId);
+        query.whereEqualTo("id_of_friend", friend_id);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject ob : objects) {
+                        if (ob.getBoolean("liked") && liked && !loved && !ob.getBoolean("loved")) {
+                            result[0] = true;
+
+                        } else if (loved && ob.getBoolean("loved") && liked && ob.getBoolean("liked")) {
+                            result[0] = true;
+                        }
+                        ob.deleteInBackground();
+                    }
+
+                    if (!result[0]) {
+                        addRelationship(friend_id, liked, loved);
+                    }
+
+
+                    restartActivity();
+
+
+                } else if (objects.size() > 1) {
+                } else {
+                }
+
+            }
+        });
+
+        return result[0];
     }
+
+    private void restartActivity() {
+        //activity is already restarted in the button listner
+        //could be stopping while aysnc task is completing, but i think the taks should still commplete
+
+        Intent myIntent = new Intent(getContext(), ListFriends.class);
+        ((Activity) getContext()).finish();
+        getContext().startActivity(myIntent);
+    }
+
+
     public void addRelationship(String id_of_friend, boolean liked, boolean loved) {
         ParseObject relationship = new ParseObject("relationship");
         relationship.put("my_id", myId);
