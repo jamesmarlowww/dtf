@@ -1,7 +1,9 @@
 package com.dtfapp;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -93,26 +96,32 @@ public class ListFriends extends FragmentActivity {
             public void run() {
                 // runs after 3 seconds
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
+
+//                popUp();
             }
+
+
         }, 3000);
 
         final String PREFS_NAME = "MyPrefsFile";
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        if (settings.getBoolean("my_first_time", true)) {
-            //the app is being launched for first time, do something
-            Log.d("Comments", "First time");
 
-            // first time task
 
-            HowToScreen hts = new HowToScreen();
-            fragmentTransaction.replace(android.R.id.content, hts);
-            fragmentTransaction.commit();
 
-            // record the fact that the app has been started at least once
-            settings.edit().putBoolean("my_first_time", false).commit();
-        }
+    }
+
+    private void popUp() {
+        new AlertDialog.Builder(this)
+                .setMessage("If you want to sleep with someone press on the bed" +
+                        "\n\nIf you want more press the heart")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+                .show();
     }
 
     public void addRelationship(String id, boolean liked, boolean loved) {
@@ -278,6 +287,8 @@ public class ListFriends extends FragmentActivity {
             }
         });
     }
+
+
 
     public void logInParse(String uid) throws ParseException {
         ParseUser user = new ParseUser();

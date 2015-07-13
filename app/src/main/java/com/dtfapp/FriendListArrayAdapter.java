@@ -13,10 +13,13 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -114,6 +117,10 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
         viewHolder.friendName.setText(friendList.get(pos).getFriendName());
 
+        DisplayMetrics display = new DisplayMetrics();
+
+
+
         //calls the aysnc task. So the main thread doesn't have to wait for the internet download of pic
         new DownloadImage().execute(new MyTaskParams(friendList.get(pos).getId(), viewHolder.friendPic));
 
@@ -197,8 +204,6 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     }
 
     private void restartActivity() {
-        //activity is already restarted in the button listner
-        //could be stopping while aysnc task is completing, but i think the taks should still commplete
 
         Intent myIntent = new Intent(getContext(), ListFriends.class);
         ((Activity) getContext()).finish();
@@ -240,6 +245,9 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
         @Override
         protected void onPostExecute(Void result) {
+            //changes the size of the bitmap. Can't get the screensize.
+//            bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+            bitmap = getCroppedBitmap(bitmap);
             imageView.setImageBitmap(getCroppedBitmap(bitmap));
         }
 
