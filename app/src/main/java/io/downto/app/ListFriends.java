@@ -1,17 +1,17 @@
-package com.dtfapp;
+package io.downto.app;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,12 +23,10 @@ import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.downto.app.R;
 
 /**
  * Created by James on 5/23/2015.
@@ -80,8 +80,6 @@ public class ListFriends extends FragmentActivity {
 
 
 
-
-
         //follow this method to log into parse then get fb frends
         getUserId();
 
@@ -100,14 +98,7 @@ public class ListFriends extends FragmentActivity {
 //                popUp();
             }
 
-
         }, 3000);
-
-        final String PREFS_NAME = "MyPrefsFile";
-
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-
 
 
     }
@@ -144,7 +135,9 @@ public class ListFriends extends FragmentActivity {
                                 // Application code for users friends
 
                                 if (jsonArray.length() > 0) setHasFriends(true);
-                                else setHasFriends(false);
+                                else {
+                                    setHasFriends(false);
+                                }
 
 
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -349,8 +342,10 @@ public class ListFriends extends FragmentActivity {
                         logInParse(myId);
 
 
+
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        makeToast(e.toString(), Toast.LENGTH_LONG);
                     } catch (ParseException e) {
                         makeToast(e.toString(), Toast.LENGTH_LONG);
                         e.printStackTrace();
@@ -360,10 +355,18 @@ public class ListFriends extends FragmentActivity {
         }).executeAsync();
     }
 
+
+
     public void displayFriends() {
+        int screenWidth = 0;
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        screenWidth = size.x;
+
 
         listViewFriends = (ListView) findViewById(R.id.listFriends);
-        FriendListArrayAdapter friendListAdapter = new FriendListArrayAdapter(this, R.layout.row, friendsInfo, myId);
+        FriendListArrayAdapter friendListAdapter = new FriendListArrayAdapter(this, R.layout.row, friendsInfo, myId, screenWidth);
         listViewFriends.setAdapter(friendListAdapter);
 
         listViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -374,6 +377,24 @@ public class ListFriends extends FragmentActivity {
             }
 
         });
+
+        if(!hasFriends) {
+            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+        }
+
+        SharedPreferences prefs = getSharedPreferences("com.dtfapp", MODE_PRIVATE);
+
+        if (prefs.getBoolean("firstrun", true)) {
+            prefs.edit().putBoolean("firstrun", false).commit();
+            popUp();
+        }
+
+
+
+
+
     }
 
     private class ArrayHolder {
@@ -394,32 +415,20 @@ public class ListFriends extends FragmentActivity {
         Toast.makeText(getApplicationContext(), s, len).show();
     }
 
+
     public void setHasFriends(boolean hasFriends) {
         this.hasFriends = hasFriends;
     }
-
     public boolean isHasFriends() {
         return hasFriends;
     }
-
     public void setYouLike(boolean youLike) {
         this.youLike = youLike;
     }
-
     public boolean isYouLike() {
         return youLike;
     }
-
-    public boolean isYouLove() {
-        return youLove;
-    }
-
-    public void restartActivity() {
-        Intent i = getIntent();
-        finish();
-        startActivity(i);
-    }
-
+    public boolean isYouLove() { return youLove; }
     public void setYouLove(boolean youLove) {
         this.youLove = youLove;
     }

@@ -1,4 +1,4 @@
-package com.dtfapp;
+package io.downto.app;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,15 +15,12 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseObject;
@@ -44,13 +41,16 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     private Context context;
     private String myId;
     private ArrayList<FriendInfo> friendList = new ArrayList<FriendInfo>();
+    private int screenWidth;
 
-    public FriendListArrayAdapter(Context context, int resource, ArrayList<FriendInfo> friendList, String myId) {
+
+    public FriendListArrayAdapter(Context context, int resource, ArrayList<FriendInfo> friendList, String myId, int screenWidth) {
         super(context, resource, friendList);
         this.context = context;
         resourceID = resource;
         this.myId = myId;
         this.friendList = friendList;
+        this.screenWidth = screenWidth;
 
     }
 
@@ -120,22 +120,21 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
         DisplayMetrics display = new DisplayMetrics();
 
 
-
         //calls the aysnc task. So the main thread doesn't have to wait for the internet download of pic
-        new DownloadImage().execute(new MyTaskParams(friendList.get(pos).getId(), viewHolder.friendPic));
+        new DownloadImage().execute(new MyTaskParams(friendList.get(pos).getId(), viewHolder.friendPic, screenWidth));
 
         //sets the color of the icon.
         //adds the duplicate icon if both friends like/love
-        if(friendList.get(pos).isYouTick()) {
+        if (friendList.get(pos).isYouTick()) {
             viewHolder.tick.setColorFilter(Color.parseColor("#76c720"));
-            if(friendList.get(pos).isTheyTick()) {
+            if (friendList.get(pos).isTheyTick()) {
                 viewHolder.tick2.setColorFilter(Color.parseColor("#76c720"));
                 viewHolder.tick2.setVisibility(View.VISIBLE);
             }
         }
-        if(friendList.get(pos).isYouHeart()) {
+        if (friendList.get(pos).isYouHeart()) {
             viewHolder.heart.setColorFilter(Color.parseColor("#D32F2F"));
-            if(friendList.get(pos).isTheyHeart()) {
+            if (friendList.get(pos).isTheyHeart()) {
                 viewHolder.heart2.setColorFilter(Color.parseColor("#D32F2F"));
                 viewHolder.heart2.setVisibility(View.VISIBLE);
             }
@@ -147,10 +146,12 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     private class MyTaskParams {
         String id;
         ImageView imageView;
+        int screenSize;
 
-        MyTaskParams(String id, ImageView imageView) {
+        MyTaskParams(String id, ImageView imageView, int screenSize) {
             this.id = id;
             this.imageView = imageView;
+            this.screenSize = screenSize;
 
         }
     }
@@ -159,8 +160,6 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
      * If the relationship exists delete the row
      * if the new relationship is exactly the same. Only delete the row (i.e if heart is hightlighted, the same press on it removes it)
      * else remove the old row and add the new relationship
-     *
-     *
      *
      * @return
      */
@@ -189,7 +188,6 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                         addRelationship(friend_id, liked, loved);
                     }
 
-
                     restartActivity();
 
 
@@ -204,7 +202,6 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     }
 
     private void restartActivity() {
-
         Intent myIntent = new Intent(getContext(), ListFriends.class);
         ((Activity) getContext()).finish();
         getContext().startActivity(myIntent);
@@ -223,21 +220,23 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
     private class DownloadImage extends AsyncTask<MyTaskParams, Void, Void> {
         ImageView imageView;
         Bitmap bitmap;
+        int screenSize;
 
         @Override
         protected Void doInBackground(MyTaskParams... params) {
             MyTaskParams im = params[0];
             String id = im.id;
             imageView = im.imageView;
+            screenSize = im.screenSize;
             try {
                 URL imageURL = new URL("https://graph.facebook.com/" + id + "/picture?type=large");
                 InputStream inputStream = (InputStream) imageURL.getContent();
                 bitmap = BitmapFactory.decodeStream(inputStream);
 
 
-            } catch(MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 e.printStackTrace();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
@@ -245,8 +244,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
 
         @Override
         protected void onPostExecute(Void result) {
-            //changes the size of the bitmap. Can't get the screensize.
-//            bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+            bitmap = Bitmap.createScaledBitmap(bitmap, screenSize/6, screenSize/6, false);
+
             bitmap = getCroppedBitmap(bitmap);
             imageView.setImageBitmap(getCroppedBitmap(bitmap));
         }
@@ -271,6 +270,7 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
             canvas.drawBitmap(bitmap, rect, rect, paint);
             return output;
         }
+
         //is a circle, slightly smaller
         public Bitmap getCroppedBitmap(Bitmap bitmap) {
             Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
@@ -292,7 +292,7 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
         }
     }
 
-    class ViewHolder{
+    class ViewHolder {
         ImageView friendPic;
         TextView friendName;
         ImageView tick;

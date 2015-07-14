@@ -1,4 +1,4 @@
-package com.dtfapp;
+package io.downto.app;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -36,12 +36,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.downto.app.R;
+
 
 public class StartScreen extends Activity {
 
     private Button fbbutton;
     private boolean is18;
-
 
     // Creating Facebook CallbackManager Value
     public static CallbackManager callbackmanager;
@@ -51,6 +52,8 @@ public class StartScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getHashKey();
+
         Parse.initialize(this, "LD9q9E8DBtXQGetITICyXpW9yVVR3ZSEscEvKDfW", "CCTYV5PIHxQ7HG3avmXBl8fu62XKrBWRdEC8xvAg");
 
 
@@ -59,7 +62,7 @@ public class StartScreen extends Activity {
         setContentView(R.layout.start_screen);
 
         if (checkLogin()) {
-            Intent i = new Intent(StartScreen.this, ListFriends.class);
+            Intent i = new Intent(StartScreen.this, io.downto.app.ListFriends.class);
             finish();
             startActivity(i);
         }
@@ -207,7 +210,6 @@ public class StartScreen extends Activity {
             Log.e("no such an algorithm", e.toString());
         }
     }
-
     public void setIs18(boolean is18) {
         this.is18 = is18;
     }

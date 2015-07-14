@@ -1,4 +1,4 @@
-package com.dtfapp;
+package io.downto.app;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
+
+import io.downto.app.R;
 
 /**
  * Created by James on 6/29/2015.

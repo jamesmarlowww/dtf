@@ -1,4 +1,4 @@
-package com.dtfapp;
+package io.downto.app;
 
 import android.app.Activity;
 import android.os.Bundle;
