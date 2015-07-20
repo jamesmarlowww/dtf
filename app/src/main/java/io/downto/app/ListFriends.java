@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.downto.app.R;
-
 /**
  * Created by James on 5/23/2015.
  */
@@ -79,7 +77,6 @@ public class ListFriends extends FragmentActivity {
         fragmentTransaction.commit();
 
 
-
         //follow this method to log into parse then get fb frends
         getUserId();
 
@@ -115,13 +112,7 @@ public class ListFriends extends FragmentActivity {
                 .show();
     }
 
-    public void addRelationship(String id, boolean liked, boolean loved) {
-        ParseObject relationship = new ParseObject("relationship");
-        relationship.put("id_of_friend", id);
-        relationship.put("liked", liked);
-        relationship.put("loved", loved);
-        relationship.saveInBackground();
-    }
+
 
     public boolean findFriends() {
         GraphRequestBatch batch = new GraphRequestBatch(
@@ -183,103 +174,62 @@ public class ListFriends extends FragmentActivity {
         return isHasFriends();
     }
 
-    //either gets the liked or loved friends based off boolean
-    private void getMyRelationship() {
-        final ArrayHolder multiArray = new ArrayHolder(new ArrayList(), new ArrayList());
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
-        //gets all rows where id = myId
-        query.whereEqualTo("my_id", myId);
-        query.findInBackground(new FindCallback<ParseObject>() {
+    /**
+     * This method gets the all the saved relationships
+     * between logged in person and friends
+     * Every person liked/loved is added to myArray then put into myRelationshipArrays
+     * Every friend that has liked/loved is added to friendsArray then into myFriendsRelationshipArrays
+     *
+     * Parse compound query is used instead of using two separate queries
+     */
+    private void getPersonalAndFriendsSavedRelationship() {
+        final ArrayHolder myArray = new ArrayHolder(new ArrayList(), new ArrayList());
+        final ArrayHolder friendsArray = new ArrayHolder(new ArrayList(), new ArrayList());
 
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    for (ParseObject j : objects) {
-                        boolean liked = j.getBoolean("liked");
-                        boolean loved = j.getBoolean("loved");
-                        String str = j.getString("id_of_friend");
+        ParseQuery<ParseObject> my = ParseQuery.getQuery("relationship");
+        my.whereEqualTo("my_id", myId);
 
+        ParseQuery<ParseObject> friends = ParseQuery.getQuery("relationship");
+        friends.whereEqualTo("id_of_friend", myId);
+
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
+        queries.add(my);
+        queries.add(friends);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> objects, ParseException e) {
+                for (ParseObject j : objects) {
+                    boolean liked = j.getBoolean("liked");
+                    boolean loved = j.getBoolean("loved");
+                    String my_id = j.getString("my_id");
+                    String id_of_friend = j.getString("id_of_friend");
+                    if (j.getString("id_of_friend").equals(myId)) {
                         if (liked)
-                            multiArray.liked.add(str);
+                            friendsArray.liked.add(my_id);
 
                         if (loved)
-                            multiArray.loved.add(str);
+                            friendsArray.loved.add(my_id);
                     }
 
-
-                    myRelationshipArrays = multiArray;
-                    getFriendsRelationship();
-
-
-                } else if (objects.size() > 1) {
-                    makeToast("repeated friend in db", Toast.LENGTH_LONG);
-                } else {
-                    makeToast(e.toString(), Toast.LENGTH_LONG);
-                }
-
-            }
-        });
-    }
-
-
-    private void getFriendsRelationship() {
-
-        final ArrayHolder multiArray = new ArrayHolder(new ArrayList(), new ArrayList());
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("relationship");
-        //gets all rows where id_of_friend = myId
-        query.whereEqualTo("id_of_friend", myId);
-        query.findInBackground(new FindCallback<ParseObject>() {
-
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    for (ParseObject j : objects) {
-                        boolean liked = j.getBoolean("liked");
-                        boolean loved = j.getBoolean("loved");
-                        String str = j.getString("my_id");
-
+                    if (j.getString("my_id").equals(myId)) {
                         if (liked)
-                            multiArray.liked.add(str);
+                            myArray.liked.add(id_of_friend);
 
                         if (loved)
-                            multiArray.loved.add(str);
-
+                            myArray.loved.add(id_of_friend);
                     }
-
-                    myFriendsRelationShipArray = multiArray;
-                    findFriends();
-
-                } else if (objects.size() > 1) {
-                    makeToast("repeated friend in db", Toast.LENGTH_LONG);
-                } else {
-                    makeToast(e.toString(), Toast.LENGTH_LONG);
                 }
 
+
+                myFriendsRelationShipArray = friendsArray;
+                myRelationshipArrays = myArray;
+                findFriends();
             }
         });
     }
 
-    private void getFriendsList(String user) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("friendship");
-        query.whereEqualTo("user1", user);
-
-        query.findInBackground(new FindCallback<ParseObject>() {
-
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    for (ParseObject j : objects) {
-//                        friendsList.add(j.getString("user2"));
-                    }
-
-                } else {
-//                    debugPopUp("e.getMessage(): ", e.getMessage().toString());
-                }
-
-            }
-        });
-    }
 
 
 
@@ -297,12 +247,12 @@ public class ListFriends extends FragmentActivity {
                     //finds the facebook friends
 //                    findFriends();
 
-                    getMyRelationship();
+                    getPersonalAndFriendsSavedRelationship();
 
                 } else {
 //                    signUpToParse(user);
 //                    findFriends();
-                    getMyRelationship();
+                    getPersonalAndFriendsSavedRelationship();
                 }
 
             }
@@ -342,7 +292,6 @@ public class ListFriends extends FragmentActivity {
                         logInParse(myId);
 
 
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                         makeToast(e.toString(), Toast.LENGTH_LONG);
@@ -354,7 +303,6 @@ public class ListFriends extends FragmentActivity {
             }
         }).executeAsync();
     }
-
 
 
     public void displayFriends() {
@@ -378,7 +326,7 @@ public class ListFriends extends FragmentActivity {
 
         });
 
-        if(!hasFriends) {
+        if (!hasFriends) {
             makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
             makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
             makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
@@ -390,9 +338,6 @@ public class ListFriends extends FragmentActivity {
             prefs.edit().putBoolean("firstrun", false).commit();
             popUp();
         }
-
-
-
 
 
     }
@@ -419,16 +364,23 @@ public class ListFriends extends FragmentActivity {
     public void setHasFriends(boolean hasFriends) {
         this.hasFriends = hasFriends;
     }
+
     public boolean isHasFriends() {
         return hasFriends;
     }
+
     public void setYouLike(boolean youLike) {
         this.youLike = youLike;
     }
+
     public boolean isYouLike() {
         return youLike;
     }
-    public boolean isYouLove() { return youLove; }
+
+    public boolean isYouLove() {
+        return youLove;
+    }
+
     public void setYouLove(boolean youLove) {
         this.youLove = youLove;
     }

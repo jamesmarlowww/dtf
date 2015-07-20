@@ -77,10 +77,6 @@ public class StartScreen extends Activity {
         });
 
 
-//        TextView tv = (TextView) findViewById(R.id.penis);
-//        rotateText(tv);
-
-
     }
 
     public void rotateText(TextView tv) {
