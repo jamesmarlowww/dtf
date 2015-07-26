@@ -1,6 +1,8 @@
 package io.downto.app;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -22,6 +24,12 @@ public class LoadingScreen extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.loading_spin_frag, container, false);
         TextView tv = (TextView) view.findViewById(R.id.penisText);
+
+        SharedPreferences prefs = this.getActivity().getSharedPreferences("io.downto.app", Context.MODE_PRIVATE);
+        if (prefs.getString("loadingText", null)!=null) {
+            tv.setText(prefs.getString("loadingText", null));
+        }
+
 
         rotateText(tv);
         return  view;

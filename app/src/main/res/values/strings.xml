@@ -9,6 +9,7 @@
     <string name="down_to_with_dots">down to .......?</string>
     <string name="down_to">Down to</string>
     <string name="down_to_example">down to hangout? down to date?</string>
+    <string name="changeLoadingText">Change loading text</string>
 
 
 </resources>

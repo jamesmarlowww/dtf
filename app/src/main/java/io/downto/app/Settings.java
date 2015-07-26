@@ -1,10 +1,17 @@
 package io.downto.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class Settings extends Activity {
@@ -15,25 +22,42 @@ public class Settings extends Activity {
         setContentView(R.layout.settings_fragment);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
+    public void fabBack(View v) {
+        finish();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void howTo(View v) {
+        finish();
     }
+
+
+    public void changeText(View v) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        final EditText edittext = new EditText(getApplicationContext());
+        edittext.setTextColor(Color.BLACK);
+        alert.setTitle("Loading text");
+        alert.setMessage("\n");
+
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //What ever you want to do with the value
+                String value = edittext.getText().toString();
+
+                SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
+                prefs.edit().putString("loadingText", value).commit();
+
+                finish();
+                Intent i = new Intent(getApplicationContext(), ListFriends.class);
+                startActivity(i);
+
+            }
+        });
+
+
+        alert.show();
+    }
+
 }
