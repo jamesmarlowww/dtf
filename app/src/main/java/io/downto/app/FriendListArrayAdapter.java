@@ -187,6 +187,8 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
                     if (!result[0]) {
                         addRelationship(friend_id, liked, loved);
                     }
+
+                    restartActivity();
                 } else if (objects.size() > 1) {
                 } else {
                 }
@@ -194,7 +196,7 @@ public class FriendListArrayAdapter extends ArrayAdapter<FriendInfo> {
             }
         });
 
-        restartActivity();
+
 
         return result[0];
     }

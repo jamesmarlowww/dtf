@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -27,6 +28,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +68,7 @@ public class ListFriends extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_friends_frag);
+        setContentView(R.layout.list_friends);
 
         fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -77,11 +79,17 @@ public class ListFriends extends FragmentActivity {
         fragmentTransaction.commit();
 
 
-        //follow this method to log into parse then get fb frends
-        getUserId();
+        //this block starts the loading process.
+        SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
+        if (prefs.getString("uid", null)==null) {
+            getUserId();
+        } else {
+            myId = prefs.getString("uid", null);
+            getPersonalAndFriendsSavedRelationship();
+        }
 
 
-        //makes the backround transparent
+        //makes the background transparent
         View v = (View) findViewById(R.id.background);
         v.getBackground().setAlpha(20);
 
@@ -91,12 +99,9 @@ public class ListFriends extends FragmentActivity {
             public void run() {
                 // runs after 3 seconds
                 fragmentManager.beginTransaction().remove(loadingScreen).commit();
-
-//                popUp();
             }
 
         }, 3000);
-
 
     }
 
@@ -123,7 +128,6 @@ public class ListFriends extends FragmentActivity {
                             public void onCompleted(
                                     JSONArray jsonArray,
                                     GraphResponse response) {
-                                // Application code for users friends
 
                                 if (jsonArray.length() > 0) setHasFriends(true);
                                 else {
@@ -260,25 +264,7 @@ public class ListFriends extends FragmentActivity {
     }
 
 
-    private void signUpToParse(ParseUser user) {
-//        user.signUpInBackground(new SignUpCallback() {
-//            @Override
-//            public void done(com.parse.ParseException e) {
-//                if (e == null) {
-//                    // Hooray! Let them use the app now.
-//
-//                    //need to log in here
-//                    findFriends();
-//
-//                } else {
-//                    // Sign up didn't succeed. Look at the ParseException
-//                    // to figure out what went wrong
-//
-//                }
-//            }
-//
-//        });
-    }
+
 
 
     private void getUserId() {
@@ -289,15 +275,15 @@ public class ListFriends extends FragmentActivity {
                     try {
                         myId = user.getString("id");
 
-                        logInParse(myId);
+                        SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
+                        prefs.edit().putString("uid", myId).commit();
+
+                        getPersonalAndFriendsSavedRelationship();
 
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                         makeToast(e.toString(), Toast.LENGTH_LONG);
-                    } catch (ParseException e) {
-                        makeToast(e.toString(), Toast.LENGTH_LONG);
-                        e.printStackTrace();
                     }
                 }
             }
@@ -327,19 +313,40 @@ public class ListFriends extends FragmentActivity {
         });
 
         if (!hasFriends) {
-            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
-            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
-            makeToast("You're the first one out of your facebook friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+            makeToast("You don't have any friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+            makeToast("You don't have any friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
+            makeToast("You don't have any friends using Down to. Only friends using the app will appear ", Toast.LENGTH_LONG);
         }
 
-        SharedPreferences prefs = getSharedPreferences("com.dtfapp", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
 
         if (prefs.getBoolean("firstrun", true)) {
             prefs.edit().putBoolean("firstrun", false).commit();
             popUp();
         }
+    }
+
+    public void fabPressed(View v) {
+        Intent i = new Intent(this, Settings.class);
+        startActivity(i);
+    }
 
 
+
+    private void signUpToParse(ParseUser user) {
+        user.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if (e == null) {
+                    // Hooray! Let them use the app now.
+                    //need to log in here
+
+                } else {
+                    // Sign up didn't succeed. Look at the ParseException
+                    // to figure out what went wrong
+                }
+            }
+        });
     }
 
     private class ArrayHolder {
@@ -356,10 +363,7 @@ public class ListFriends extends FragmentActivity {
         this.myId = myId;
     }
 
-    public void makeToast(String s, int len) {
-        Toast.makeText(getApplicationContext(), s, len).show();
-    }
-
+    public void makeToast(String s, int len) { Toast.makeText(getApplicationContext(), s, len).show();   }
 
     public void setHasFriends(boolean hasFriends) {
         this.hasFriends = hasFriends;

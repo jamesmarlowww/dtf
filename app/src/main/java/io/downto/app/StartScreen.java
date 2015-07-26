@@ -112,14 +112,9 @@ public class StartScreen extends Activity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-
-
                         Intent i = new Intent(StartScreen.this, ListFriends.class);
-//                        finish();
+                        finish();
                         startActivity(i);
-
-//                            Toast.makeText(getApplicationContext(), "You need to be 18 or older to use this app", Toast.LENGTH_LONG).show();
-//                            LoginManager.getInstance().logOut();
 
 
                     }
