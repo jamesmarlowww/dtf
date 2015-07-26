@@ -2,6 +2,8 @@ package io.downto.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,10 @@ import android.widget.EditText;
 
 public class Settings extends Activity {
 
+    private FragmentManager fragmentManager;
+    private HowTo howTo;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +33,16 @@ public class Settings extends Activity {
     }
 
     public void howTo(View v) {
-        finish();
+        fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        howTo = new HowTo();
+        fragmentTransaction.replace(android.R.id.content, howTo);
+        fragmentTransaction.commit();
+
+    }
+
+    public void goAway(View v) {
+        fragmentManager.beginTransaction().remove(howTo).commit();
     }
 
 
@@ -55,7 +70,6 @@ public class Settings extends Activity {
 
             }
         });
-
 
         alert.show();
     }

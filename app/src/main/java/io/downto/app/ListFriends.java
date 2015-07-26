@@ -1,6 +1,7 @@
 package io.downto.app;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
@@ -55,6 +56,7 @@ public class ListFriends extends FragmentActivity {
     LoadingScreen loadingScreen;
     private ArrayHolder myRelationshipArrays;
     private ArrayHolder myFriendsRelationShipArray;
+    private Fragment howTo;
 
     //rosid id 100000479237442
 
@@ -73,7 +75,6 @@ public class ListFriends extends FragmentActivity {
         fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Configuration configInfo = getResources().getConfiguration();
-
         loadingScreen = new LoadingScreen();
         fragmentTransaction.replace(android.R.id.content, loadingScreen);
         fragmentTransaction.commit();
@@ -322,8 +323,12 @@ public class ListFriends extends FragmentActivity {
 
         if (prefs.getBoolean("firstrun", true)) {
             prefs.edit().putBoolean("firstrun", false).commit();
-            popUp();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            howTo = new HowTo();
+            fragmentTransaction.replace(android.R.id.content, howTo);
+            fragmentTransaction.commit();
         }
+
     }
 
     public void fabPressed(View v) {
@@ -342,6 +347,10 @@ public class ListFriends extends FragmentActivity {
                 }
             }
         });
+    }
+
+    public void goAway(View v) {
+        fragmentManager.beginTransaction().remove(howTo).commit();
     }
 
     private class ArrayHolder {
