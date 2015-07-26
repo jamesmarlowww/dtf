@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/changeLoadingText"
         android:text="@string/changeLoadingText"
@@ -25,7 +25,7 @@
 
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/howTo"
         android:text="How to use app"
@@ -42,9 +42,7 @@
         android:layout_height="0.5dp"
         android:layout_below="@+id/howTo"
         android:background="@android:color/darker_gray"/>
-
-
-
+.
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabBack"
