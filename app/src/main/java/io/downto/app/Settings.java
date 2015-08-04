@@ -14,6 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.facebook.login.LoginManager;
 
 
 public class Settings extends Activity {
@@ -45,6 +48,28 @@ public class Settings extends Activity {
         fragmentManager.beginTransaction().remove(howTo).commit();
     }
 
+    public void logOut(View v) {
+
+        LoginManager.getInstance().logOut();
+
+        SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
+        prefs.edit().putString("uid", null).commit();
+
+        Intent intent = new Intent(getApplicationContext(), StartScreen.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+
+
+//        Intent i = new Intent(getApplicationContext(), ListFriends.class);
+//        startActivity(i);
+
+
+
+
+
+    }
+
 
     public void changeText(View v) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -62,11 +87,17 @@ public class Settings extends Activity {
                 String value = edittext.getText().toString();
 
                 SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
-                prefs.edit().putString("loadingText", value).commit();
+                if (value.length() == 0) {
+                    Toast.makeText(getApplicationContext(), "Text feild is empty", Toast.LENGTH_LONG).show();
 
-                finish();
-                Intent i = new Intent(getApplicationContext(), ListFriends.class);
-                startActivity(i);
+                } else {
+                    prefs.edit().putString("loadingText", value).commit();
+                    finish();
+                    Intent i = new Intent(getApplicationContext(), ListFriends.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+                }
+
 
             }
         });

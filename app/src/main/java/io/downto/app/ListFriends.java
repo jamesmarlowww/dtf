@@ -4,11 +4,14 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -82,7 +85,7 @@ public class ListFriends extends FragmentActivity {
 
         //this block starts the loading process.
         SharedPreferences prefs = getSharedPreferences("io.downto.app", MODE_PRIVATE);
-        if (prefs.getString("uid", null)==null) {
+        if (prefs.getString("uid", null) == null) {
             getUserId();
         } else {
             myId = prefs.getString("uid", null);
@@ -104,6 +107,11 @@ public class ListFriends extends FragmentActivity {
 
         }, 3000);
 
+
+        if(!isNetworkConnected())
+            makeToast("Make sure that you are connected to the internet", Toast.LENGTH_LONG);
+
+
     }
 
     private void popUp() {
@@ -119,7 +127,6 @@ public class ListFriends extends FragmentActivity {
     }
 
 
-
     public boolean findFriends() {
         GraphRequestBatch batch = new GraphRequestBatch(
                 GraphRequest.newMyFriendsRequest(
@@ -130,9 +137,22 @@ public class ListFriends extends FragmentActivity {
                                     JSONArray jsonArray,
                                     GraphResponse response) {
 
-                                if (jsonArray.length() > 0) setHasFriends(true);
+                                if (jsonArray.length() >= 0) {
+                                    setHasFriends(true);
+
+                                }
                                 else {
                                     setHasFriends(false);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
+                                    makeToast("You're setting trends mate, you don't have any facebook friends using this app. Only friends using this app will appear", Toast.LENGTH_LONG);
                                 }
 
 
@@ -184,7 +204,7 @@ public class ListFriends extends FragmentActivity {
      * between logged in person and friends
      * Every person liked/loved is added to myArray then put into myRelationshipArrays
      * Every friend that has liked/loved is added to friendsArray then into myFriendsRelationshipArrays
-     *
+     * <p/>
      * Parse compound query is used instead of using two separate queries
      */
     private void getPersonalAndFriendsSavedRelationship() {
@@ -205,37 +225,39 @@ public class ListFriends extends FragmentActivity {
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
-                for (ParseObject j : objects) {
-                    boolean liked = j.getBoolean("liked");
-                    boolean loved = j.getBoolean("loved");
-                    String my_id = j.getString("my_id");
-                    String id_of_friend = j.getString("id_of_friend");
-                    if (j.getString("id_of_friend").equals(myId)) {
-                        if (liked)
-                            friendsArray.liked.add(my_id);
+                if (e == null) {
+                    for (ParseObject j : objects) {
+                        boolean liked = j.getBoolean("liked");
+                        boolean loved = j.getBoolean("loved");
+                        String my_id = j.getString("my_id");
+                        String id_of_friend = j.getString("id_of_friend");
+                        if (j.getString("id_of_friend").equals(myId)) {
+                            if (liked)
+                                friendsArray.liked.add(my_id);
 
-                        if (loved)
-                            friendsArray.loved.add(my_id);
+                            if (loved)
+                                friendsArray.loved.add(my_id);
+                        }
+
+                        if (j.getString("my_id").equals(myId)) {
+                            if (liked)
+                                myArray.liked.add(id_of_friend);
+
+                            if (loved)
+                                myArray.loved.add(id_of_friend);
+                        }
                     }
 
-                    if (j.getString("my_id").equals(myId)) {
-                        if (liked)
-                            myArray.liked.add(id_of_friend);
 
-                        if (loved)
-                            myArray.loved.add(id_of_friend);
-                    }
+                    myFriendsRelationShipArray = friendsArray;
+                    myRelationshipArrays = myArray;
+                    findFriends();
+                } else {
+                    makeToast("Something went wrong, check you are connect to the internet", Toast.LENGTH_LONG);
                 }
-
-
-                myFriendsRelationShipArray = friendsArray;
-                myRelationshipArrays = myArray;
-                findFriends();
             }
         });
     }
-
-
 
 
     public void logInParse(String uid) throws ParseException {
@@ -263,9 +285,6 @@ public class ListFriends extends FragmentActivity {
             }
         });
     }
-
-
-
 
 
     private void getUserId() {
@@ -331,11 +350,21 @@ public class ListFriends extends FragmentActivity {
 
     }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            // There are no active networks.
+            return false;
+        } else
+            return true;
+    }
+
+
     public void fabPressed(View v) {
         Intent i = new Intent(this, Settings.class);
         startActivity(i);
     }
-
 
 
     private void signUpToParse(ParseUser user) {
@@ -367,7 +396,9 @@ public class ListFriends extends FragmentActivity {
         this.myId = myId;
     }
 
-    public void makeToast(String s, int len) { Toast.makeText(getApplicationContext(), s, len).show();   }
+    public void makeToast(String s, int len) {
+        Toast.makeText(getApplicationContext(), s, len).show();
+    }
 
     public void setHasFriends(boolean hasFriends) {
         this.hasFriends = hasFriends;

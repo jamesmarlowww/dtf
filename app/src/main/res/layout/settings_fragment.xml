@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/changeLoadingText"
         android:text="@string/changeLoadingText"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="#000000"
         android:onClick="changeText"
         android:padding="25dp"/>
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/howTo"
         android:text="How to use app"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="#000000"
         android:padding="25dp"
         android:layout_below="@+id/line"
@@ -41,6 +41,25 @@
         android:id="@+id/line2"
         android:layout_height="0.5dp"
         android:layout_below="@+id/howTo"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/logOut"
+        android:text="Log out of facebook"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:padding="25dp"
+        android:layout_below="@+id/line2"
+        android:onClick="logOut"/>
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:id="@+id/line3"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/logOut"
         android:background="@android:color/darker_gray"/>
 .
 
